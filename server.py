@@ -92,9 +92,9 @@ print("Found %d GPUs available. Using GPU %d (%s) of compute capability %d.%d wi
 
 ## Load the models one by one.
 print("Preparing the encoder, the synthesizer and the vocoder...")
-encoder.load_model(args.enc_model_fpath)
-synthesizer = Synthesizer(args.syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
-vocoder.load_model(args.voc_model_fpath)
+encoder.load_model(enc_model_fpath)
+synthesizer = Synthesizer(syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
+vocoder.load_model(voc_model_fpath)
 
 # TODO: embedding should not be hardcoded
 default_in_fpath = "/home/jonathan/jon_voice.wav"
