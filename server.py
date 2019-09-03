@@ -58,7 +58,9 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    data64 = base64.b64encode(np.array2string(generated_wav))
+    #data64 = base64.b64encode(np.array2string(generated_wav))
+    data64 = base64.b64encode(generated_wav.tobytes()).decode()
+    #data64 = base64.b64encode(generated_wav)
     return jsonify({ "wav64": data64, "text": text })
 
 if __name__ == '__main__':
