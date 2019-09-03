@@ -66,7 +66,10 @@ def tts():
     fpath = "/home/jonathan/demo_output_%02s.wav" % now
 
     out = io.BytesIO()
-    wavfile.write(out, synthesizer.sample_rate, generated_wav.astype(np.int16))
+
+    wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
+
+    wavfile.write(out, synthesizer.sample_rate, wav_norm.astype(np.int16))
 
     # librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
     # print("\nSaved output as %s\n\n" % fpath)
