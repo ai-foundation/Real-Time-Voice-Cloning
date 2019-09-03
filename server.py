@@ -60,8 +60,8 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    datetimestring = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    fpath = "/home/jonathan/demo_output_%02s.wav" % datetimestring
+    now = datetime.datetime.now().strftime("%m-%d-%Y-%-H-%M-%S")
+    fpath = "/home/jonathan/demo_output_%02s.wav" % now
     librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
     print("\nSaved output as %s\n\n" % fpath)
 
