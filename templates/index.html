@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>AI Foundation - Voice Cloning Engine</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" 
+     integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <style>
+      body {
+        padding-top: 54px;
+      }
+      @media (min-width: 992px) {
+        body {
+          padding-top: 56px;
+        }
+        .mt-5 {
+          font-family: helvetica;
+          font-size: 45px;
+          font-weight: bold;
+        }
+        .portrait-row .portrait {
+          width: 300px;
+          cursor: pointer;
+        }
+        .portrait-row #deepak-portrait {
+          margin-left: 30px;
+        }
+        .input-row {
+          margin: 40px 0;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }
+        #clear-text-button {
+          position: relative;
+          width: 28px;
+          left: -30px;
+          border: 1px solid lightgray;
+          border-radius: 50%;
+        }
+      }
+      @media (max-width: 992px) {
+        .mt-5 {
+          font-family: helvetica;
+          font-size: 25px;
+          font-weight: bold;
+        }
+        .portrait-row .portrait {
+          width: 150px;
+          cursor: pointer;
+        }
+        .portrait-row #deepak-portrait {
+          margin-left: 20px;
+        }
+        .input-row {
+          margin: 20px 0;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }
+        input {
+          width: 250px;
+        }
+        #clear-text-button {
+          position: relative;
+          width: 26px;
+          left: -28px;
+          border: 1px solid lightgray;
+          border-radius: 50%;
+        }
+      }
+      .portrait-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+        margin: 40px 0;
+      }
+      #loading-spinner {
+        margin: 0 auto;
+        width: 200px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
+          <div id="models"></div>
+          <div class="input-row">
+            <input id="text" placeholder="Enter text" size=45 type="text" name="text">
+            <div id="clear-text-button" name="clear">X</div>
+          </div>
+          <div id="synthesize">Synthesize Text</div>
+          <!-- <div class="portrait-row">
+            <image class="portrait" id="obama-portrait" src="/static/images/obama.png"/>
+            <image class="portrait" id="deepak-portrait"  src="/static/images/deepak.png"/>
+          </div> -->
+          <iframe id="autoplay-silence" src="/static/silence.wav" allow="autoplay" hidden></iframe>
+          <audio id="audio" controls autoplay hidden muted src="/static/silence.wav"></audio>
+          <p id="message"></p>
+          <image class="spinner" id="loading-spinner" src="/static/images/spinner.gif" hidden/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
+    <script>
+      function q(selector) { return document.querySelector(selector) }
+      // select obama model as default
+      // q('#deepak-portrait').style.opacity = '0.2'
+      // $('#models').data('selectedModel', 'Obama (fast)')
+      q('#text').focus()
+
+      function triggerSynthesize() {
+        text = q('#text').value
+        // model_selected = $('#models').data('selectedModel')
+        if (text) {
+          // q('#deepak-portrait').style.cursor = 'not-allowed'
+          // q('#obama-portrait').style.cursor = 'not-allowed'
+          q('#loading-spinner').hidden = false
+          q('#audio').hidden = true
+          q('#audio').muted = false
+          synthesize(text)
+        }
+      }
+      q('#clear-text-button').addEventListener('click', function(e) {
+        q('#text').value = ''
+      })
+
+      q('#synthesize').addEventListener('click', function(e) {
+        triggerSynthesize()
+      })
+    
+      // q('#obama-portrait').addEventListener('click', function(e) {
+      //   q('#obama-portrait').style.opacity = '1.0'
+      //   q('#deepak-portrait').style.opacity = '0.2'
+      //   $('#models').data('selectedModel', 'Obama (fast)')
+      //   triggerSynthesize()
+      // })
+      // q('#deepak-portrait').addEventListener('click', function(e) {
+      //   q('#obama-portrait').style.opacity = '0.2'
+      //   q('#deepak-portrait').style.opacity = '1.0'
+      //   $('#models').data('selectedModel', 'Deepak (fast)')
+      //   triggerSynthesize()
+      // })
+      // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
+      function b64toBlob(b64Data, contentType='', sliceSize=512) {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+        }
+        
+        const blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      };
+      // http://www.unicode.org/Public/security/latest/confusables.txt
+      // use canadian syllabics PA to replace < and > in tag
+      // use reverse solidus operator for \
+      // replace { and } with medium right curly brace ornament and medium left curly brace ornament
+      // otherwise, cannot render the tags in the debug json output
+      function fixit(string) {
+        return string.replace(/\\/g, '⧵').
+                      replace(/}/g, '❵').
+                      replace(/{/g, '❴').
+                      replace(/</g, 'ᐸ').
+                      replace(/>/g, 'ᐳ');
+      };
+      function synthesize(text) {
+        // model_selected = $('#models').data('selectedModel')
+        options_str = '&text=' + encodeURIComponent(text)
+        fetch_str = '/api/tts?' + options_str
+        fetch(fetch_str, {cache: 'no-cache'})
+          .then(function(res) {
+            if (!res.ok) throw Error(res.statusText)
+            return res.json()
+          })
+          .then(function(data) {
+            txt = data["text"]
+            // q('#deepak-portrait').style.cursor = 'pointer'
+            // q('#obama-portrait').style.cursor = 'pointer'
+            const blob = b64toBlob(data["wav64"], "audio/wav")
+            q('#audio').src = URL.createObjectURL(blob)
+            q('#audio').hidden = false
+            q('#message').hidden = true
+            q('#loading-spinner').hidden = true
+          })
+          .catch(function(err) {
+            q('#message').textContent = 'Error: ' + err.message
+            q('#message').hidden = false
+            q('#loading-spinner').hidden = true
+            // q('#deepak-portrait').style.cursor = 'pointer'
+            // q('#obama-portrait').style.cursor = 'pointer'
+          })
+      }
+    </script>
+  </body>
+</html>

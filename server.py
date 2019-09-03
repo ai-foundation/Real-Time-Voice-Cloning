@@ -35,9 +35,9 @@ def load_config(config_path):
 app = Flask(__name__)
 
 # TODO: Add a UI for server
-# @app.route('/')
-# def index():
-#     return render_template('index.html', static_url_path='/static')
+@app.route('/')
+def index():
+    return render_template('index.html', static_url_path='/static')
 
 # TODO: route for new speaker
 # @app.route('/api/train', methods=['POST'])
@@ -58,9 +58,7 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    #data64 = base64.b64encode(np.array2string(generated_wav))
     data64 = base64.b64encode(generated_wav.tobytes()).decode()
-    #data64 = base64.b64encode(generated_wav)
     return jsonify({ "wav64": data64, "text": text })
 
 if __name__ == '__main__':
