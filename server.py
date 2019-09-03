@@ -14,6 +14,8 @@ from flask import jsonify
 import re
 import json
 import base64
+import time
+import datetime
 
 embeds = []
 
@@ -58,7 +60,15 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    data64 = base64.b64encode(generated_wav.tobytes()).decode()
+    datetimestring = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    fpath = "/home/jonathan/demo_output_%02s.wav" % datetimestring
+    librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
+    print("\nSaved output as %s\n\n" % fpath)
+
+    output_wav_file = open(fpath)
+
+    data64 = base64.b64encode(output_wav_file.read()).decode()
+    output_wav_file.close()
     return jsonify({ "wav64": data64, "text": text })
 
 if __name__ == '__main__':
