@@ -16,6 +16,8 @@ import json
 import base64
 import time
 import datetime
+from scipy.io import wavfile
+import io
 
 embeds = []
 
@@ -62,13 +64,15 @@ def tts():
 
     now = datetime.datetime.now().strftime("%m-%d-%Y-%-H-%M-%S")
     fpath = "/home/jonathan/demo_output_%02s.wav" % now
-    librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
-    print("\nSaved output as %s\n\n" % fpath)
 
-    output_wav_file = open(fpath)
+    out = io.BytesIO()
+    wavfile.write(out, synthesizer.sample_rate, generated_wav.astype(np.int16))
 
-    data64 = base64.b64encode(output_wav_file.read()).decode()
-    output_wav_file.close()
+    # librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
+    # print("\nSaved output as %s\n\n" % fpath)
+    # output_wav_file = open(fpath)
+
+    data64 = base64.b64encode(out.getvalue()).decode()
     return jsonify({ "wav64": data64, "text": text })
 
 if __name__ == '__main__':
