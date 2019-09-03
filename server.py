@@ -14,8 +14,6 @@ from flask import jsonify
 import re
 import json
 import base64
-import time
-import datetime
 from scipy.io import wavfile
 import io
 
@@ -61,9 +59,6 @@ def tts():
     # generate waveform
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
-
-    now = datetime.datetime.now().strftime("%m-%d-%Y-%-H-%M-%S")
-    fpath = "/home/jonathan/demo_output_%02s.wav" % now
 
     out = io.BytesIO()
 
@@ -129,7 +124,7 @@ if __name__ == '__main__':
     vocoder.load_model(args.voc_model_fpath)
 
     # TODO: embedding should not be hardcoded
-    default_in_fpath = "/home/jonathan/jon_voice.wav"
+    default_in_fpath = "/home/jonathan/steve_loughlin_voice.wav"
     preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
     embed = encoder.embed_utterance(preprocessed_wav)
     embeds = [embed]
