@@ -32,12 +32,6 @@ def load_config(config_path):
     config.update(data)
     return config
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    '-c', '--config_path', type=str, help='path to config file for training')
-args = parser.parse_args()
-
-config = load_config(args.config_path)
 app = Flask(__name__)
 
 # TODO: Add a UI for server
@@ -84,8 +78,12 @@ if __name__ == '__main__':
         "If True, the memory used by the synthesizer will be freed after each use. Adds large "
         "overhead but allows to save some GPU memory for lower-end GPUs.")
     
+    parser.add_argument(
+        '-c', '--config_path', type=str, help='path to config file for training')
+
     args = parser.parse_args()
     print_args(args, parser)
+    config = load_config(args.config_path)
 
     ## Print some environment information (for debugging purposes)
     print("Running a test of your configuration...\n")
