@@ -1,0 +1,6 @@
+{
+  "port": 5009,
+  "encoder_model_fpath": "/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
+  "vocoder_model_fpath": "/home/jonathan/rt-voice-cloning-models/vocoder/saved_models/pretrained/pretrained.pt",
+  "synthesizer_model_fpath": "/home/jonathan/rt-voice-cloning-models/synthesizer/saved_models/logs-pretrained"
+}
