@@ -17,6 +17,15 @@ import base64
 
 embeds = []
 
+class ModelLocation(object):
+    name = ""
+    def __init__(self, name):
+        self.name = name
+
+def make_model_location(name):
+    model_loc = ModelLocation(name)
+    return model_loc
+
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
@@ -39,9 +48,11 @@ args = parser.parse_args()
 
 config = load_config(args.config_path)
 app = Flask(__name__)
-enc_model_fpath = config.encoder_model_fpath
-voc_model_fpath = config.vocoder_model_fpath
-syn_model_fpath = config.synthesizer_model_fpath
+enc_model_fpath = make_model_location(config.encoder_model_fpath)
+voc_model_fpath = make_model_location(config.vocoder_model_fpath)
+syn_model_fpath =  make_model_location(config.synthesizer_model_fpath)
+
+
 
 # TODO: Add a UI for server
 # @app.route('/')
