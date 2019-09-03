@@ -17,15 +17,6 @@ import base64
 
 embeds = []
 
-class ModelLocation(object):
-    name = ""
-    def __init__(self, name):
-        self.name = name
-
-def make_model_location(name):
-    model_loc = ModelLocation(name)
-    return model_loc
-
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
@@ -48,11 +39,6 @@ args = parser.parse_args()
 
 config = load_config(args.config_path)
 app = Flask(__name__)
-enc_model_fpath = make_model_location(config.encoder_model_fpath)
-voc_model_fpath = make_model_location(config.vocoder_model_fpath)
-syn_model_fpath =  make_model_location(config.synthesizer_model_fpath)
-
-
 
 # TODO: Add a UI for server
 # @app.route('/')
@@ -81,37 +67,56 @@ def tts():
     data64 = base64.b64encode(np.array2string(generated_wav))
     return jsonify({ "wav64": data64, "text": text })
 
-## Print some environment information (for debugging purposes)
-print("Running a test of your configuration...\n")
-if not torch.cuda.is_available():
-    print("Your PyTorch installation is not configured to use CUDA. If you have a GPU ready "
-            "for deep learning, ensure that the drivers are properly installed, and that your "
-            "CUDA version matches your PyTorch installation. CPU-only inference is currently "
-            "not supported.", file=sys.stderr)
-    quit(-1)
-device_id = torch.cuda.current_device()
-gpu_properties = torch.cuda.get_device_properties(device_id)
-print("Found %d GPUs available. Using GPU %d (%s) of compute capability %d.%d with "
-        "%.1fGb total memory.\n" % 
-        (torch.cuda.device_count(),
-        device_id,
-        gpu_properties.name,
-        gpu_properties.major,
-        gpu_properties.minor,
-        gpu_properties.total_memory / 1e9))
-
-
-## Load the models one by one.
-print("Preparing the encoder, the synthesizer and the vocoder...")
-encoder.load_model(enc_model_fpath)
-synthesizer = Synthesizer(syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
-vocoder.load_model(voc_model_fpath)
-
-# TODO: embedding should not be hardcoded
-default_in_fpath = "/home/jonathan/jon_voice.wav"
-preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
-embed = encoder.embed_utterance(preprocessed_wav)
-embeds = [embed]
-
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("-e", "--enc_model_fpath", type=Path, 
+                        default="encoder/saved_models/pretrained.pt",
+                        help="Path to a saved encoder")
+    parser.add_argument("-s", "--syn_model_dir", type=Path, 
+                        default="synthesizer/saved_models/logs-pretrained/",
+                        help="Directory containing the synthesizer model")
+    parser.add_argument("-v", "--voc_model_fpath", type=Path, 
+                        default="vocoder/saved_models/pretrained/pretrained.pt",
+                        help="Path to a saved vocoder")
+    parser.add_argument("--low_mem", action="store_true", help=\
+        "If True, the memory used by the synthesizer will be freed after each use. Adds large "
+        "overhead but allows to save some GPU memory for lower-end GPUs.")
+    
+    args = parser.parse_args()
+    print_args(args, parser)
+
+    ## Print some environment information (for debugging purposes)
+    print("Running a test of your configuration...\n")
+    if not torch.cuda.is_available():
+        print("Your PyTorch installation is not configured to use CUDA. If you have a GPU ready "
+                "for deep learning, ensure that the drivers are properly installed, and that your "
+                "CUDA version matches your PyTorch installation. CPU-only inference is currently "
+                "not supported.", file=sys.stderr)
+        quit(-1)
+    device_id = torch.cuda.current_device()
+    gpu_properties = torch.cuda.get_device_properties(device_id)
+    print("Found %d GPUs available. Using GPU %d (%s) of compute capability %d.%d with "
+            "%.1fGb total memory.\n" % 
+            (torch.cuda.device_count(),
+            device_id,
+            gpu_properties.name,
+            gpu_properties.major,
+            gpu_properties.minor,
+            gpu_properties.total_memory / 1e9))
+
+
+    ## Load the models one by one.
+    print("Preparing the encoder, the synthesizer and the vocoder...")
+    encoder.load_model(args.enc_model_fpath})
+    synthesizer = Synthesizer(args.syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
+    vocoder.load_model(args.voc_model_fpath)
+
+    # TODO: embedding should not be hardcoded
+    default_in_fpath = "/home/jonathan/jon_voice.wav"
+    preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
+    embed = encoder.embed_utterance(preprocessed_wav)
+    embeds = [embed]
+
     app.run(debug=True, host='0.0.0.0', port=config.port)
