@@ -61,6 +61,9 @@ def tts():
 
 
 if __name__ == '__main__':
+    config = load_config(args.config_path)
+    app = Flask(__name__)
+
     enc_model_fpath = config.encoder_model_fpath
     voc_model_fpath = config.vocoder_model_fpath
     syn_model_fpath = config.synthesizer_model_fpath
