@@ -32,6 +32,12 @@ def load_config(config_path):
     config.update(data)
     return config
 
+config = load_config(args.config_path)
+app = Flask(__name__)
+enc_model_fpath = config.encoder_model_fpath
+voc_model_fpath = config.vocoder_model_fpath
+syn_model_fpath = config.synthesizer_model_fpath
+
 # TODO: Add a UI for server
 # @app.route('/')
 # def index():
@@ -58,12 +64,6 @@ def tts():
 
     data64 = base64.b64encode(np.array2string(generated_wav))
     return jsonify({ "wav64": data64, "text": text })
-
-config = load_config(args.config_path)
-app = Flask(__name__)
-enc_model_fpath = config.encoder_model_fpath
-voc_model_fpath = config.vocoder_model_fpath
-syn_model_fpath = config.synthesizer_model_fpath
 
 ## Print some environment information (for debugging purposes)
 print("Running a test of your configuration...\n")
