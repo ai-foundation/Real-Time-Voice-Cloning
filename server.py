@@ -32,6 +32,11 @@ def load_config(config_path):
     config.update(data)
     return config
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-c', '--config_path', type=str, help='path to config file for training')
+args = parser.parse_args()
+
 config = load_config(args.config_path)
 app = Flask(__name__)
 enc_model_fpath = config.encoder_model_fpath
