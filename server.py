@@ -34,6 +34,14 @@ def load_config(config_path):
     config.update(data)
     return config
 
+def trim_silence(y):
+    yt, index = librosa.effects.trim(y)
+    splits = []
+    for start, end in librosa.effects.split(yt):
+        splits.append(yt[start:end])
+    yhat = np.concatenate(splits)
+    return yhat
+
 app = Flask(__name__)
 
 # TODO: Add a UI for server
@@ -64,7 +72,9 @@ def tts():
 
     wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
 
-    wavfile.write(out, synthesizer.sample_rate, wav_norm.astype(np.int16))
+    wav_norm_trimmed = trim_silence(wav_norm)
+
+    wavfile.write(out, synthesizer.sample_rate, wav_norm_trimmed.astype(np.int16))
 
     # librosa.output.write_wav(fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
     # print("\nSaved output as %s\n\n" % fpath)
