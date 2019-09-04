@@ -168,10 +168,10 @@ if __name__ == '__main__':
     vocoder.load_model(args.voc_model_fpath)
 
     # TODO: THIS SHUOLD BE MOVED TO ITS OWN ROUTE
-    default_in_fpath = "/home/jonathan/venky-1.wav"
-    preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
-    embed = encoder.embed_utterance(preprocessed_wav)
-    embeds = [embed]
-    save_embedding_to_disk("venky-1", embed)
+    # default_in_fpath = "/home/jonathan/venky-1.wav"
+    # preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
+    # embed = encoder.embed_utterance(preprocessed_wav)
+    # embeds = [embed]
+    # save_embedding_to_disk("venky-1", embed)
 
     app.run(debug=True, host='0.0.0.0', port=config.port)
