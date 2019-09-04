@@ -104,11 +104,12 @@
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div id="models"></div>
-          <div class="input-row">
+          <!-- <div class="input-row">
             <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
             <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
           </div>
-          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
+          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button> -->
+          <div>Select a Speaker</div>
           <div class="input-row">
             <select id="speakers" name="speakers"></select>
           </div>
@@ -135,9 +136,9 @@
       // $('#models').data('selectedModel', 'Obama (fast)')
       q('#text').focus()
 
-      function uploadAndTrain() {
-        console.log(q('#speakers').selectedOptions[0].value)
-      }
+      // function uploadAndTrain() {
+        
+      // }
 
       function fetchSpeakers() {
         fetch_str = '/api/speakers'
