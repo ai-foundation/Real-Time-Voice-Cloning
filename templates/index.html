@@ -153,7 +153,7 @@
               var option = document.createElement('option')
               option.text = option.value = speakers[i]
               option.onclick((e => {
-                q(`#speakers option[value='%s']` % option.value).prop('selected', true)
+                q(`#speakers option[value='${option.value}']`).prop('selected', true)
               }))
               speakerSelect.add(option, 0)
             }
