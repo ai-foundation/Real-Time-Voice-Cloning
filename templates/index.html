@@ -135,9 +135,9 @@
       // $('#models').data('selectedModel', 'Obama (fast)')
       q('#text').focus()
 
-      // function uploadAndTrain() {
-
-      // }
+      function uploadAndTrain() {
+        console.log(q('#speakers').children("option:selected").val())
+      }
 
       function fetchSpeakers() {
         fetch_str = '/api/speakers'
@@ -152,9 +152,6 @@
             for (var i=0; i<speakers.length; i++) {
               var option = document.createElement('option')
               option.text = option.value = speakers[i]
-              option.onclick((e => {
-                q(`#speakers option[value='${option.value}']`).prop('selected', true)
-              }))
               speakerSelect.add(option, 0)
             }
           })
@@ -181,6 +178,10 @@
 
       q('#synthesize').addEventListener('click', function(e) {
         triggerSynthesize()
+      })
+
+      q('#upload').addEventListener('click', function(e) {
+        uploadAndTrain()
       })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
