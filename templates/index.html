@@ -104,11 +104,11 @@
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div id="models"></div>
-          <!-- <div class="input-row">
+          <div class="input-row">
             <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
             <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
           </div>
-          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button> -->
+          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           <div>Select a Speaker</div>
           <div class="input-row">
             <select id="speakers" name="speakers"></select>
@@ -136,15 +136,16 @@
       // $('#models').data('selectedModel', 'Obama (fast)')
       q('#text').focus()
 
-      // function uploadAndTrain() {
-      //   const reader = new FileReader()
+      function uploadAndTrain() {
+        // const reader = new FileReader()
 
-      //   reader.onload = function (e) {
-      //     console.log(e.target)
-      //   }
+        // reader.onload = function (e) {
+        //   console.log(e.target)
+        // }
 
-      //   // reader.readAsArrayBuffer(audioBlob)
-      // }
+        // reader.readAsArrayBuffer(audioBlob)
+        console.log(q('#upload-audio'))
+      }
 
       function fetchSpeakers() {
         fetch_str = '/api/speakers'
@@ -222,7 +223,6 @@
                       replace(/>/g, 'ᐳ');
       };
       function synthesize(text, selectedSpeaker) {
-        // model_selected = $('#models').data('selectedModel')
         options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker
         fetch_str = '/api/tts?' + options_str
         fetch(fetch_str, {cache: 'no-cache'})
