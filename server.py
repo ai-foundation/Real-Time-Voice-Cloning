@@ -160,9 +160,12 @@ if __name__ == '__main__':
     vocoder.load_model(args.voc_model_fpath)
 
     # TODO: embedding should not be hardcoded
-    default_in_fpath = "/home/jonathan/steve_loughlin_voice.wav"
+    default_in_fpath = "/home/jonathan/liza_voice.wav"
     preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
     embed = encoder.embed_utterance(preprocessed_wav)
     embeds = [embed]
+
+    # TODO: FOR DEV REMOVE THIS
+    save_embedding_to_disk('liza', embed)
 
     app.run(debug=True, host='0.0.0.0', port=config.port)
