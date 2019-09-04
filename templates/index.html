@@ -136,7 +136,7 @@
       q('#text').focus()
 
       function uploadAndTrain() {
-        console.log(q('#speakers').children("option:selected").val())
+        console.log(q('#speakers').selectedOptions[0].value)
       }
 
       function fetchSpeakers() {
@@ -151,7 +151,7 @@
             var speakerSelect = q('#speakers')
             for (var i=0; i<speakers.length; i++) {
               var option = document.createElement('option')
-              option.text = option.value = speakers[i]
+              option.text = option.value = speakers[i].split('.')[0]
               speakerSelect.add(option, 0)
             }
           })
@@ -161,15 +161,16 @@
 
       function triggerSynthesize() {
         text = q('#text').value
+        selectedSpeaker = q('#speakers').selectedOptions[0].value
         // model_selected = $('#models').data('selectedModel')
-        if (text) {
+        if (text && selectedSpeaker) {
           // q('#deepak-portrait').style.cursor = 'not-allowed'
           // q('#obama-portrait').style.cursor = 'not-allowed'
           q('#synthesize').hidden = true
           q('#loading-spinner').hidden = false
           q('#audio').hidden = true
           q('#audio').muted = false
-          synthesize(text)
+          synthesize(text, selectedSpeaker)
         }
       }
       q('#clear-text-button').addEventListener('click', function(e) {
@@ -213,9 +214,9 @@
                       replace(/</g, 'ᐸ').
                       replace(/>/g, 'ᐳ');
       };
-      function synthesize(text) {
+      function synthesize(text, selectedSpeaker) {
         // model_selected = $('#models').data('selectedModel')
-        options_str = '&text=' + encodeURIComponent(text)
+        options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker
         fetch_str = '/api/tts?' + options_str
         fetch(fetch_str, {cache: 'no-cache'})
           .then(function(res) {
