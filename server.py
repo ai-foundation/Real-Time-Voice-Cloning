@@ -47,11 +47,15 @@ def get_saved_embedding_names():
     filenames = [f for f in listdir(embeddings_location) if f.endswith('.npy')]
     return filenames
 
+def get_speaker_embedding(speaker):
+    embed = np.load(embeddings_location + '/' + speaker + '.npy')
+    return embed
+
 #####################################################################################
 #  Initialize server and any global variables
 #####################################################################################
 
-embeds = []
+# embeds = []
 embeddings_location = '/home/jonathan/voice-cloning-embeddings'
 saved_embeddings = get_saved_embedding_names()
 app = Flask(__name__)
@@ -81,10 +85,13 @@ def speakers():
 @app.route('/api/tts', methods=['GET'])
 def tts():
     text = request.args.get('text')
+    speaker = request.args.get('speaker')
 
     # - Directly load from the filepath:
     # TODO: should not be hardcoded
     texts = [text]
+    embed = get_speaker_embedding(speaker)
+    embeds = [embed]
     specs = synthesizer.synthesize_spectrograms(texts, embeds)
     # create mel spectrogram
     spec = specs[0]
@@ -159,13 +166,10 @@ if __name__ == '__main__':
     synthesizer = Synthesizer(args.syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
     vocoder.load_model(args.voc_model_fpath)
 
-    # TODO: embedding should not be hardcoded
-    default_in_fpath = "/home/jonathan/liza_voice.wav"
-    preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
-    embed = encoder.embed_utterance(preprocessed_wav)
-    embeds = [embed]
-
-    # TODO: FOR DEV REMOVE THIS
-    save_embedding_to_disk('liza', embed)
+    # TODO: THIS SHUOLD BE MOVED TO ITS OWN ROUTE
+    # default_in_fpath = "/home/jonathan/liza_voice.wav"
+    # preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
+    # embed = encoder.embed_utterance(preprocessed_wav)
+    # embeds = [embed]
 
     app.run(debug=True, host='0.0.0.0', port=config.port)
