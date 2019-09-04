@@ -105,14 +105,15 @@
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div id="models"></div>
           <div class="input-row">
+            <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
+            <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
+          </div>
+          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
+          <div class="input-row">
             <input id="text" placeholder="Enter text" size=45 type="text" name="text">
             <div id="clear-text-button" name="clear">X</div>
           </div>
-          <div id="synthesize">Synthesize Text</div>
-          <!-- <div class="portrait-row">
-            <image class="portrait" id="obama-portrait" src="/static/images/obama.png"/>
-            <image class="portrait" id="deepak-portrait"  src="/static/images/deepak.png"/>
-          </div> -->
+          <button type="button" class="btn btn-primary" id="synthesize">Synthesize Text</button>
           <iframe id="autoplay-silence" src="/static/silence.wav" allow="autoplay" hidden></iframe>
           <audio id="audio" controls autoplay hidden muted src="/static/silence.wav"></audio>
           <p id="message"></p>
@@ -131,12 +132,17 @@
       // $('#models').data('selectedModel', 'Obama (fast)')
       q('#text').focus()
 
+      // function uploadAndTrain() {
+
+      // }
+
       function triggerSynthesize() {
         text = q('#text').value
         // model_selected = $('#models').data('selectedModel')
         if (text) {
           // q('#deepak-portrait').style.cursor = 'not-allowed'
           // q('#obama-portrait').style.cursor = 'not-allowed'
+          q('#synthesize').hidden = true
           q('#loading-spinner').hidden = false
           q('#audio').hidden = true
           q('#audio').muted = false
@@ -151,18 +157,6 @@
         triggerSynthesize()
       })
     
-      // q('#obama-portrait').addEventListener('click', function(e) {
-      //   q('#obama-portrait').style.opacity = '1.0'
-      //   q('#deepak-portrait').style.opacity = '0.2'
-      //   $('#models').data('selectedModel', 'Obama (fast)')
-      //   triggerSynthesize()
-      // })
-      // q('#deepak-portrait').addEventListener('click', function(e) {
-      //   q('#obama-portrait').style.opacity = '0.2'
-      //   q('#deepak-portrait').style.opacity = '1.0'
-      //   $('#models').data('selectedModel', 'Deepak (fast)')
-      //   triggerSynthesize()
-      // })
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
       function b64toBlob(b64Data, contentType='', sliceSize=512) {
         const byteCharacters = atob(b64Data);
@@ -203,20 +197,18 @@
           })
           .then(function(data) {
             txt = data["text"]
-            // q('#deepak-portrait').style.cursor = 'pointer'
-            // q('#obama-portrait').style.cursor = 'pointer'
             const blob = b64toBlob(data["wav64"], "audio/wav")
             q('#audio').src = URL.createObjectURL(blob)
             q('#audio').hidden = false
             q('#message').hidden = true
-            q('#loading-spinner').hidden = true
           })
           .catch(function(err) {
             q('#message').textContent = 'Error: ' + err.message
             q('#message').hidden = false
+          })
+          .finally(function() {
             q('#loading-spinner').hidden = true
-            // q('#deepak-portrait').style.cursor = 'pointer'
-            // q('#obama-portrait').style.cursor = 'pointer'
+            q('#synthesize').hidden = false
           })
       }
     </script>

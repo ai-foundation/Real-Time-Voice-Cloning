@@ -16,8 +16,12 @@ import json
 import base64
 from scipy.io import wavfile
 import io
+from os import listdir
+from os.path import isfile, join
 
-embeds = []
+#####################################################################################
+#  Helper methods
+#####################################################################################
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -34,18 +38,46 @@ def load_config(config_path):
     config.update(data)
     return config
 
+def save_embedding_to_disk(name, embedding):
+    # TODO: move the location of the embeddings to config or as an argument
+    np.save('/home/jonathan/voice-cloning-embeddings/%s.npy' % name, embedding)
+
+def get_saved_embedding_names():
+    # TODO: LOCATION OF EMBEDDINGS SHOULD COME FROM CONFIG OR ARGUMENTS
+    filenames = [f for f in listdir(embeddings_location) if f.endswith('.npy')]
+    return filenames
+
+#####################################################################################
+#  Initialize server and any global variables
+#####################################################################################
+
+embeds = []
+embeddings_location = '/home/jonathan/voice-cloning-embeddings'
+saved_embeddings = get_saved_embedding_names()
 app = Flask(__name__)
+
+#####################################################################################
+#  API routes and handlers
+#####################################################################################
 
 # TODO: Add a UI for server
 @app.route('/')
 def index():
     return render_template('index.html', static_url_path='/static')
 
+@app.route('/api/speakers', methods=['GET'])
+def speakers():
+    speakers = get_saved_embedding_names()
+    return jsonify({ "speakers": speakers })
+
 # TODO: route for new speaker
 # @app.route('/api/train', methods=['POST'])
 # def train():
+    
+
 
 # TODO: route shuould take parameter for embedding
+# TODO: should take a 'speaker' parameter for specifying which speaker embedding to use
 @app.route('/api/tts', methods=['GET'])
 def tts():
     text = request.args.get('text')
@@ -72,6 +104,10 @@ def tts():
 
     data64 = base64.b64encode(out.getvalue()).decode()
     return jsonify({ "wav64": data64, "text": text })
+
+#####################################################################################
+#  Main
+#####################################################################################
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -127,6 +163,10 @@ if __name__ == '__main__':
     default_in_fpath = "/home/jonathan/steve_loughlin_voice.wav"
     preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
     embed = encoder.embed_utterance(preprocessed_wav)
+
+    # TODO: REMOVE THIS PART JUST FOR DEV
+    save_embedding_to_disk('steve-loughlin', embed)
+
     embeds = [embed]
 
     app.run(debug=True, host='0.0.0.0', port=config.port)
