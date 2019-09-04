@@ -110,6 +110,9 @@
           </div>
           <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           <div class="input-row">
+            <select id="speakers" name="speakers"></select>
+          </div>
+          <div class="input-row">
             <input id="text" placeholder="Enter text" size=45 type="text" name="text">
             <div id="clear-text-button" name="clear">X</div>
           </div>
@@ -135,6 +138,26 @@
       // function uploadAndTrain() {
 
       // }
+
+      function fetchSpeakers() {
+        fetch_str = '/api/speakers'
+        fetch(fetch_str, { cache: 'no-cache' })
+          .then(function(res) {
+            if (!res.ok) throw Error(res.statusText)
+            return res.json()
+          })
+          .then(function(data) {
+            speakers = data["speakers"]
+            var speakerSelect = q('#speakers')
+            for (var i=0; i<speakers.length; i++) {
+              var option = document.createElement('option')
+              option.text = option.value = speakers[i]
+              select.add(option, 0)
+            }
+          })
+      }
+
+      fetchSpeakers()
 
       function triggerSynthesize() {
         text = q('#text').value

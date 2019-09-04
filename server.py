@@ -163,10 +163,6 @@ if __name__ == '__main__':
     default_in_fpath = "/home/jonathan/steve_loughlin_voice.wav"
     preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
     embed = encoder.embed_utterance(preprocessed_wav)
-
-    # TODO: REMOVE THIS PART JUST FOR DEV
-    save_embedding_to_disk('steve-loughlin', embed)
-
     embeds = [embed]
 
     app.run(debug=True, host='0.0.0.0', port=config.port)
