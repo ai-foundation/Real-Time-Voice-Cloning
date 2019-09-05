@@ -73,8 +73,8 @@ def confirm_parameters(speaker, audio_fpath):
     print("audio clips directory: ")
     print(audio_fpath)
     print("Enter [y/n] to continue: ")
-    choice = raw_input().lower()
-    if choice is "y":
+    choice = input().lower()
+    if choice == "y":
         print("Continuing embedding creation...")
     else:
         print("Exiting...")
