@@ -11,6 +11,7 @@ from scipy.io import wavfile
 from pathlib import Path
 import re
 import json
+import os
 
 #####################################################################################
 #  Helper methods 
@@ -58,6 +59,14 @@ def system_check():
             gpu_properties.minor,
             gpu_properties.total_memory / 1e9))
 
+def absoluteFilePaths(directory):
+    fpaths = []
+   for dirpath,_,filenames in os.walk(directory):
+       for f in filenames:
+           fpaths.append(os.path.abspath(os.path.join(dirpath, f)))
+    print(fpaths)
+    return fpaths
+
 #####################################################################################
 #  Train a new speaker by using average speaker embedding
 #####################################################################################
@@ -69,14 +78,13 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
                         default="encoder/saved_models/pretrained.pt",
                         help="Path to a saved encoder")
-    parser.add_argument("-f", "--audio_clip_fpath", type=Path,
+    parser.add_argument("-f", "--audio_clips_fpath", type=Path,
                         default="",
                         help="Path to audio clip to train")
     parser.add_argument(
                     '-c', '--config_path', type=str, help='path to config file for training')
-    # parser.add_argument("-s", "--syn_model_dir", type=Path, 
-    #                     default="synthesizer/saved_models/logs-pretrained/",
-    #                     help="Directory containing the synthesizer model")
+    parser.add_argument(
+                    '-speaker', '--speaker_name', type=str, help='name of speaker for embedding')
     
     args = parser.parse_args()
     print_args(args, parser)
@@ -89,7 +97,8 @@ if __name__ == '__main__':
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
 
-    audio_clip_fpaths = ["/home/jonathan/rt-voice-cloning-models/collin-2-1.wav","/home/jonathan/rt-voice-cloning-models/collin-2-2.wav","/home/jonathan/rt-voice-cloning-models/collin-2-3.wav","/home/jonathan/rt-voice-cloning-models/collin-2-4.wav","/home/jonathan/rt-voice-cloning-models/collin-2-4.wav","/home/jonathan/rt-voice-cloning-models/collin-2-5.wav"]
+    audio_clip_fpaths = absoluteFilePaths(args.audio_clips_fpath)
+
     embed_array = None
     for audio_clip_fpath in audio_clip_fpaths:
         embed_array = None
@@ -104,6 +113,6 @@ if __name__ == '__main__':
             embed_array = np.concatenate(embed_array, embed)
     embed_array
 
-    save_embedding_to_disk('collin-2', embed_array)
+    save_embedding_to_disk(args.speaker_name, embed_array)
 
 
