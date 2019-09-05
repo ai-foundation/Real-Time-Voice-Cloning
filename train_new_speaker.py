@@ -8,6 +8,9 @@ import argparse
 import torch
 import sys
 from scipy.io import wavfile
+from pathlib import Path
+import re
+import json
 
 #####################################################################################
 #  Helper methods 
@@ -69,6 +72,8 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--audio_clip_fpath", type=Path,
                         default="",
                         help="Path to audio clip to train")
+    parser.add_argument(
+                    '-c', '--config_path', type=str, help='path to config file for training')
     # parser.add_argument("-s", "--syn_model_dir", type=Path, 
     #                     default="synthesizer/saved_models/logs-pretrained/",
     #                     help="Directory containing the synthesizer model")
@@ -84,18 +89,21 @@ if __name__ == '__main__':
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
 
+    audio_clip_fpaths = ["/home/jonathan/rt-voice-cloning-models/collin-2-1.wav","/home/jonathan/rt-voice-cloning-models/collin-2-2.wav","/home/jonathan/rt-voice-cloning-models/collin-2-3.wav","/home/jonathan/rt-voice-cloning-models/collin-2-4.wav","/home/jonathan/rt-voice-cloning-models/collin-2-4.wav","/home/jonathan/rt-voice-cloning-models/collin-2-5.wav"]
     embed_array = None
     for audio_clip_fpath in audio_clip_fpaths:
         embed_array = None
         original_wav, sampling_rate = librosa.load(audio_clip_fpath)
         preprocessed_wav = encoder.preprocess_wav(original_wav, sampling_rate)
-        embed = np.expand_dims(encoder.embed_utterance(preprocessed_wav), axis=1)
-        if embed_array = None:
+        # embed = np.expand_dims(encoder.embed_utterance(preprocessed_wav), axis=1)
+        embed = encoder.embed_utterance(preprocessed_wav)
+        if embed_array is None:
             embed_array = embed
         else:
-            embed_array = np.concatenate((embed_array, embed), axis = 1)
-    embeds = [np.mean(embed_array, axis=1)]
+            #embed_array = np.concatenate((embed_array, embed), axis = 1)
+            embed_array = np.concatenate(embed_array, embed)
+    embed_array
 
-    save_embedding_to_disk('collin-2', embeds)
+    save_embedding_to_disk('collin-2', embed_array)
 
 
