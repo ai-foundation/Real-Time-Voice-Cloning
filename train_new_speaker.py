@@ -61,9 +61,9 @@ def system_check():
 
 def absoluteFilePaths(directory):
     fpaths = []
-   for dirpath,_,filenames in os.walk(directory):
-       for f in filenames:
-           fpaths.append(os.path.abspath(os.path.join(dirpath, f)))
+    for dirpath,_,filenames in os.walk(directory):
+        for f in filenames:
+            fpaths.append(os.path.abspath(os.path.join(dirpath, f)))
     print(fpaths)
     return fpaths
 
