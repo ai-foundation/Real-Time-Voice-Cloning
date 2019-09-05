@@ -67,6 +67,17 @@ def absoluteFilePaths(directory):
     print(fpaths)
     return fpaths
 
+def confirm_parameters():
+    print("speaker name: " + args.speaker_name)
+    print("audio clips directory: " + args.audio_clips_fpath)
+    print("Enter [y/n] to continue: ")
+    choice = raw_input().lower()
+    if choice is "y":
+        print("Continuing embedding creation...")
+    else:
+        print("Exiting...")
+        sys.exit()
+
 #####################################################################################
 #  Train a new speaker by using average speaker embedding
 #####################################################################################
@@ -91,6 +102,8 @@ if __name__ == '__main__':
     config = load_config(args.config_path)
 
     embeddings_location = config.embeddings_location
+
+    confirm_parameters()
 
     system_check()
 
