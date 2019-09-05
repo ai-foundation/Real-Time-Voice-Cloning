@@ -68,8 +68,10 @@ def absoluteFilePaths(directory):
     return fpaths
 
 def confirm_parameters(speaker, audio_fpath):
-    print("speaker name: " + speaker)
-    print("audio clips directory: " + audio_fpath)
+    print("speaker name: ")
+    print(speaker)
+    print("audio clips directory: ")
+    print(audio_fpath)
     print("Enter [y/n] to continue: ")
     choice = raw_input().lower()
     if choice is "y":
