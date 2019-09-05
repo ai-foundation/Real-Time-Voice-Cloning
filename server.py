@@ -63,7 +63,7 @@ def trim_silence(y):
 #  Initialize server and any global variables
 #####################################################################################
 
-# embeds = []
+# default embeddings location, overwritten by config
 embeddings_location = '/home/jonathan/voice-cloning-embeddings'
 saved_embeddings = get_saved_embedding_names()
 app = Flask(__name__)
@@ -146,6 +146,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print_args(args, parser)
     config = load_config(args.config_path)
+
+    embeddings_location = config.embeddings_location
 
     ## Print some environment information (for debugging purposes)
     print("Running a test of your configuration...\n")
