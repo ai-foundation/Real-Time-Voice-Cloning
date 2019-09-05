@@ -67,9 +67,9 @@ def absoluteFilePaths(directory):
     print(fpaths)
     return fpaths
 
-def confirm_parameters():
-    print("speaker name: " + args.speaker_name)
-    print("audio clips directory: " + args.audio_clips_fpath)
+def confirm_parameters(speaker, audio_fpath):
+    print("speaker name: " + speaker)
+    print("audio clips directory: " + audio_fpath)
     print("Enter [y/n] to continue: ")
     choice = raw_input().lower()
     if choice is "y":
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     embeddings_location = config.embeddings_location
 
-    confirm_parameters()
+    confirm_parameters(args.speaker_name, args.audio_clips_fpath)
 
     system_check()
 
