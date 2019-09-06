@@ -76,7 +76,7 @@ def index():
 
 @app.route('/api/speakers', methods=['GET'])
 def speakers():
-    speakers = get_saved_embedding_names()
+    speakers = sorted(get_saved_embedding_names())
     return jsonify({ "speakers": speakers })
 
 # TODO: route for new speaker
