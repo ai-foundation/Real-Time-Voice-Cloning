@@ -12,6 +12,15 @@ from pathlib import Path
 import re
 import json
 import os
+from aeneas.exacttiming import TimeValue
+from aeneas.executetask import ExecuteTask
+from aeneas.language import Language
+from aeneas.syncmap import SyncMapFormat
+from aeneas.task import Task
+from aeneas.task import TaskConfiguration
+from aeneas.textfile import TextFileFormat
+import aeneas.globalconstants as gc
+from pydub import AudioSegment
 
 #####################################################################################
 #  Helper methods 
@@ -80,6 +89,36 @@ def confirm_parameters(speaker, audio_fpath):
         print("Exiting...")
         sys.exit()
 
+def split_audio_into_clips(audio_fpath, speaker_name):
+    # create Task object
+    config = TaskConfiguration()
+    config[gc.PPN_TASK_LANGUAGE] = Language.ENG
+    config[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] = TextFileFormat.PLAIN
+    config[gc.PPN_TASK_OS_FILE_FORMAT] = SyncMapFormat.JSON
+    task = Task()
+    task.configuration = config
+    # task.audio_file_path_absolute = u"/home/jonathan/voice-clips/heather-1.wav"
+    task.audio_file_path_absolute = audio_fpath
+    task.text_file_path_absolute = u"/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt"
+
+    # process Task
+    ExecuteTask(task).execute()
+    full_voice_clip = AudioSegment.from_wav(audio_fpath)
+
+    os.mkdir('/home/jonathan/voice-clips/' + speaker_name, 755)
+
+    index = 0
+    for frag in task.sync_map.fragments:
+        if (index != 0 and index != 6):
+            print(frag.begin * 1000)
+            print(frag.end * 1000)
+            begin = frag.begin * 1000
+            end = frag.end * 1000
+            clip = full_voice_clip[float(begin): float(end)]
+            clip_name = speaker_name + '-' + str(index)
+            clip.export("/home/jonathan/voice-clips/" + speaker_name + "/" + clip_name + ".wav", format="wav")
+        index = index + 1
+
 #####################################################################################
 #  Train a new speaker by using average speaker embedding
 #####################################################################################
@@ -91,7 +130,7 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
                         default="encoder/saved_models/pretrained.pt",
                         help="Path to a saved encoder")
-    parser.add_argument("-f", "--audio_clips_fpath", type=Path,
+    parser.add_argument("-f", "--audio_fpath", type=Path,
                         default="",
                         help="Path to audio clip to train")
     parser.add_argument(
@@ -112,7 +151,9 @@ if __name__ == '__main__':
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
 
-    audio_clip_fpaths = absoluteFilePaths(args.audio_clips_fpath)
+    split_audio_into_clips(args.audio_fpath, args.speaker_name)
+
+    audio_clip_fpaths = absoluteFilePaths('/home/jonathan/voice-clips/' + args.speaker_name)
 
     embed_array = None
     for audio_clip_fpath in audio_clip_fpaths:
