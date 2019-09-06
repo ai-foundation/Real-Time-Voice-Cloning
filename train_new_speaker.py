@@ -105,7 +105,7 @@ def split_audio_into_clips(audio_fpath, speaker_name):
     ExecuteTask(task).execute()
     full_voice_clip = AudioSegment.from_wav(audio_fpath)
 
-    os.mkdir('/home/jonathan/voice-clips/' + speaker_name, 755)
+    os.mkdir('/home/jonathan/voice-clips/' + speaker_name, mode = 0o777)
 
     index = 0
     for frag in task.sync_map.fragments:
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     embeddings_location = config.embeddings_location
 
-    confirm_parameters(args.speaker_name, args.audio_clips_fpath)
+    confirm_parameters(args.speaker_name, args.audio_fpath)
 
     system_check()
 
