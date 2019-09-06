@@ -55,12 +55,9 @@ def trim_silence(y):
     return yhat
 
 #####################################################################################
-#  Initialize server and any global variables
+#  Define server and other global variables
 #####################################################################################
 
-# default embeddings location, overwritten by config
-# embeddings_location = '/home/jonathan/voice-cloning-embeddings'
-# saved_embeddings = get_saved_embedding_names()
 embeddings_location = ''
 saved_embeddings = ''
 app = Flask(__name__)
