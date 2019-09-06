@@ -42,9 +42,8 @@ def load_config(config_path):
     config.update(data)
     return config
 
-def save_embedding_to_disk(name, embedding):
-    # TODO: move the location of the embeddings to config or as an argument
-    np.save('/home/jonathan/voice-cloning-embeddings/%s.npy' % name, embedding)
+def save_embedding_to_disk(name, embedding, embeddings_location):
+    np.save(embeddings_location + '/%s.npy' % name, embedding)
 
 # TODO: test if creating embedding even needs gpu
 # check system and exit if system is lacking gpu compatability
@@ -89,7 +88,7 @@ def confirm_parameters(speaker, audio_fpath):
         print("Exiting...")
         sys.exit()
 
-def split_audio_into_clips(audio_fpath, speaker_name):
+def split_audio_into_clips(audio_fpath, speaker_name, transcript_fpath, voice_clips_location):
     # create Task object
     config = TaskConfiguration()
     config[gc.PPN_TASK_LANGUAGE] = Language.ENG
@@ -97,26 +96,24 @@ def split_audio_into_clips(audio_fpath, speaker_name):
     config[gc.PPN_TASK_OS_FILE_FORMAT] = SyncMapFormat.JSON
     task = Task()
     task.configuration = config
-    # task.audio_file_path_absolute = u"/home/jonathan/voice-clips/heather-1.wav"
     task.audio_file_path_absolute = audio_fpath
-    task.text_file_path_absolute = u"/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt"
+    task.text_file_path_absolute = transcript_fpath
 
-    # process Task
+    print("===> Calculating force alignment ...")
     ExecuteTask(task).execute()
     full_voice_clip = AudioSegment.from_wav(audio_fpath)
 
-    os.mkdir('/home/jonathan/voice-clips/' + speaker_name, mode = 0o777)
+    os.mkdir(voice_clips_location + "/" + speaker_name, mode = 0o777)
 
+    print("===> Splitting clips using force alignment boundaries ...")
     index = 0
     for frag in task.sync_map.fragments:
         if (index != 0 and index != 6):
-            print(frag.begin * 1000)
-            print(frag.end * 1000)
             begin = frag.begin * 1000
             end = frag.end * 1000
             clip = full_voice_clip[float(begin): float(end)]
             clip_name = speaker_name + '-' + str(index)
-            clip.export("/home/jonathan/voice-clips/" + speaker_name + "/" + clip_name + ".wav", format="wav")
+            clip.export(voice_clips_location + "/" + speaker_name + "/" + clip_name + ".wav", format="wav")
         index = index + 1
 
 #####################################################################################
@@ -137,12 +134,15 @@ if __name__ == '__main__':
                     '-c', '--config_path', type=str, help='path to config file for training')
     parser.add_argument(
                     '-speaker', '--speaker_name', type=str, help='name of speaker for embedding')
+    parser.add_argument(
+                    '-transcript', '--transcript_fpath', type=str, help='path to audio clip transcript')
     
     args = parser.parse_args()
     print_args(args, parser)
     config = load_config(args.config_path)
 
     embeddings_location = config.embeddings_location
+    voice_clips_location = config.voice_clips_location
 
     confirm_parameters(args.speaker_name, args.audio_fpath)
 
@@ -151,24 +151,23 @@ if __name__ == '__main__':
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
 
-    split_audio_into_clips(args.audio_fpath, args.speaker_name)
+    # takes the audio clip of the speaker and splits it up into multiple shorter audio clips
+    split_audio_into_clips(args.audio_fpath, args.speaker_name, args.transcript_fpath, voice_clips_location)
 
-    audio_clip_fpaths = absoluteFilePaths('/home/jonathan/voice-clips/' + args.speaker_name)
+    audio_clip_fpaths = absoluteFilePaths(voice_clips_location + "/" + args.speaker_name)
 
+    print("===> Processing clips and saving speaker embedding ...")
     embed_array = None
     for audio_clip_fpath in audio_clip_fpaths:
         embed_array = None
         original_wav, sampling_rate = librosa.load(audio_clip_fpath)
         preprocessed_wav = encoder.preprocess_wav(original_wav, sampling_rate)
-        # embed = np.expand_dims(encoder.embed_utterance(preprocessed_wav), axis=1)
         embed = encoder.embed_utterance(preprocessed_wav)
         if embed_array is None:
             embed_array = embed
         else:
-            #embed_array = np.concatenate((embed_array, embed), axis = 1)
             embed_array = np.concatenate(embed_array, embed)
     embed_array
 
-    save_embedding_to_disk(args.speaker_name, embed_array)
-
-
+    save_embedding_to_disk(args.speaker_name, embed_array, embeddings_location)
+    print("DONE! Speaker embedding for - " + args.speaker_name + " saved to " + embeddings_location)
