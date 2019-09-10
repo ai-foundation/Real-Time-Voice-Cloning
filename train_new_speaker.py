@@ -151,23 +151,28 @@ if __name__ == '__main__':
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
 
-    # takes the audio clip of the speaker and splits it up into multiple shorter audio clips
-    split_audio_into_clips(args.audio_fpath, args.speaker_name, args.transcript_fpath, voice_clips_location)
-
-    audio_clip_fpaths = absoluteFilePaths(voice_clips_location + "/" + args.speaker_name)
-
-    print("===> Processing clips and saving speaker embedding ...")
     embed_array = None
-    for audio_clip_fpath in audio_clip_fpaths:
-        embed_array = None
-        original_wav, sampling_rate = librosa.load(audio_clip_fpath)
+    if args.transcript_fpath:
+        # takes the audio clip of the speaker and splits it up into multiple shorter audio clips
+        split_audio_into_clips(args.audio_fpath, args.speaker_name, args.transcript_fpath, voice_clips_location)
+
+        audio_clip_fpaths = absoluteFilePaths(voice_clips_location + "/" + args.speaker_name)
+
+        print("===> Processing clips and saving speaker embedding ...")
+        for audio_clip_fpath in audio_clip_fpaths:
+            embed_array = None
+            original_wav, sampling_rate = librosa.load(audio_clip_fpath)
+            preprocessed_wav = encoder.preprocess_wav(original_wav, sampling_rate)
+            embed = encoder.embed_utterance(preprocessed_wav)
+            if embed_array is None:
+                embed_array = embed
+            else:
+                embed_array = np.concatenate(embed_array, embed)
+    else:
+        original_wav, sampling_rate = librosa.load(args.audio_fpath)
         preprocessed_wav = encoder.preprocess_wav(original_wav, sampling_rate)
         embed = encoder.embed_utterance(preprocessed_wav)
-        if embed_array is None:
-            embed_array = embed
-        else:
-            embed_array = np.concatenate(embed_array, embed)
-    embed_array
+        embed_array = embed
 
     save_embedding_to_disk(args.speaker_name, embed_array, embeddings_location)
     print("DONE! Speaker embedding for - " + args.speaker_name + " saved to " + embeddings_location)
