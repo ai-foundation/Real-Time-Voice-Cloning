@@ -38,12 +38,7 @@ def load_config(config_path):
     config.update(data)
     return config
 
-def save_embedding_to_disk(name, embedding):
-    # TODO: move the location of the embeddings to config or as an argument
-    np.save('/home/jonathan/voice-cloning-embeddings/%s.npy' % name, embedding)
-
 def get_saved_embedding_names():
-    # TODO: LOCATION OF EMBEDDINGS SHOULD COME FROM CONFIG OR ARGUMENTS
     filenames = [f for f in listdir(embeddings_location) if f.endswith('.npy')]
     return filenames
 
@@ -60,12 +55,11 @@ def trim_silence(y):
     return yhat
 
 #####################################################################################
-#  Initialize server and any global variables
+#  Define server and other global variables
 #####################################################################################
 
-# embeds = []
-embeddings_location = '/home/jonathan/voice-cloning-embeddings'
-saved_embeddings = get_saved_embedding_names()
+embeddings_location = ''
+saved_embeddings = ''
 app = Flask(__name__)
 
 #####################################################################################
@@ -79,7 +73,7 @@ def index():
 
 @app.route('/api/speakers', methods=['GET'])
 def speakers():
-    speakers = get_saved_embedding_names()
+    speakers = sorted(get_saved_embedding_names())
     return jsonify({ "speakers": speakers })
 
 # TODO: route for new speaker
@@ -96,8 +90,7 @@ def tts():
     text = request.args.get('text')
     speaker = request.args.get('speaker')
 
-    # - Directly load from the filepath:
-    # TODO: should not be hardcoded
+    # - Load the speaker embedding:
     texts = [text]
     embed = get_speaker_embedding(speaker)
     embeds = [embed]
@@ -147,6 +140,9 @@ if __name__ == '__main__':
     print_args(args, parser)
     config = load_config(args.config_path)
 
+    embeddings_location = config.embeddings_location
+    saved_embeddings = get_saved_embedding_names()
+
     ## Print some environment information (for debugging purposes)
     print("Running a test of your configuration...\n")
     if not torch.cuda.is_available():
@@ -173,11 +169,5 @@ if __name__ == '__main__':
     synthesizer = Synthesizer(args.syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
     vocoder.load_model(args.voc_model_fpath)
 
-    # TODO: THIS SHUOLD BE MOVED TO ITS OWN ROUTE
-    # default_in_fpath = "/home/jonathan/venky-1.wav"
-    # preprocessed_wav = encoder.preprocess_wav(default_in_fpath)
-    # embed = encoder.embed_utterance(preprocessed_wav)
-    # embeds = [embed]
-    # save_embedding_to_disk("venky-1", embed)
-
+    print("Starting fastsynth server...")
     app.run(debug=True, host='0.0.0.0', port=config.port)
