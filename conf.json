@@ -5,6 +5,6 @@
   "synthesizer_model_fpath": "/home/jonathan/rt-voice-cloning-models/synthesizer/saved_models/logs-pretrained",
   "embeddings_location": "/home/jonathan/voice-cloning-embeddings",
   "voice_clips_location": "/home/jonathan/voice-clips",
-  "tmp_location": "/home/jonathan/tmp",
+  "tmp_location": "/home/jonathan/rt-voice-cloning-tmp",
   "rnnoise_script_location": "/home/jonathan/rnnoise/examples/rnnoise_demo"
 }
