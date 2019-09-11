@@ -63,7 +63,7 @@ def frame_generator(frame_duration_ms,
     
 denoiser = RNNoise()
 
-wav_path = "/home/jonathan/TEST"
+wav_path = "/home/jonathan/dev/Real-Time-Voice-Cloning/before_denoise.wav"
 
 TARGET_SR = 16000
 TEMP_FILE = 'test.wav'
