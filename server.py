@@ -57,6 +57,7 @@ def trim_silence(y):
     return yhat
 
 def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
+    print("========> Beginning denoise process...")
     raw_pcm_location = tmp_dir + "/raw.pcm"
     step1 = subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
     print(step1)
