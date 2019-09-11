@@ -18,6 +18,8 @@ from scipy.io import wavfile
 import io
 from os import listdir
 from os.path import isfile, join
+import time
+import subprocess
 
 #####################################################################################
 #  Helper methods
@@ -54,12 +56,26 @@ def trim_silence(y):
     yhat = np.concatenate(splits)
     return yhat
 
+def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
+    raw_pcm_location = tmp_dir + "/raw.pcm"
+    step1 = subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
+    print(step1)
+    rnnoise = "." + rnnoise_script_location
+    denoised_pcm_location = tmp_dir + "/denoised.pcm"
+    step2 = subprocess.call([rnnoise, raw_pcm_location, denoised_pcm_location])
+    print(step2)
+    denoised_wav_location = tmp_dir + "/denoised.wav"
+    step3 = subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
+    print(step3)
+
 #####################################################################################
 #  Define server and other global variables
 #####################################################################################
 
 embeddings_location = ''
 saved_embeddings = ''
+tmp_location = ''
+rnnoise_script_location = ''
 app = Flask(__name__)
 
 #####################################################################################
@@ -101,13 +117,23 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    out = io.BytesIO()
-
     wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
-
     wav_norm_trimmed = trim_silence(wav_norm)
 
+    timestamp = str(time.time()).replace('.', '-')
+    
+    tmp_dir = tmp_location + '/' + speaker + '-' + timestamp
+    subprocess.call(["mkdir", tmp_dir])
+    tmp_fpath = tmp_dir + '/' + speaker + '-' + timestamp + '.wav'
+    librosa.output.write_wav(tmp_fpath, wav_norm_trimmed.astype(np.float32), synthesizer.sample_rate)
+
+    # WIP
+    denoise_output(rnnoise_script_location, tmp_dir, tmp_fpath)
+
+    out = io.BytesIO()
     wavfile.write(out, synthesizer.sample_rate, wav_norm_trimmed.astype(np.int16))
+
+
 
     data64 = base64.b64encode(out.getvalue()).decode()
     return jsonify({ "wav64": data64, "text": text })
@@ -141,6 +167,8 @@ if __name__ == '__main__':
     config = load_config(args.config_path)
 
     embeddings_location = config.embeddings_location
+    tmp_location = config.tmp_location
+    rnnoise_script_location = config.rnnoise_script_location
     saved_embeddings = get_saved_embedding_names()
 
     ## Print some environment information (for debugging purposes)
