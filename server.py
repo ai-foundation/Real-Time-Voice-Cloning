@@ -63,7 +63,7 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
     print(step1)
     rnnoise = "." + rnnoise_script_location
     denoised_pcm_location = tmp_dir + "/denoised.pcm"
-    step2 = subprocess.call([rnnoise, raw_pcm_location, denoised_pcm_location])
+    step2 = subprocess.call(["sh", rnnoise_script_location, raw_pcm_location, denoised_pcm_location])
     print(step2)
     denoised_wav_location = tmp_dir + "/denoised.wav"
     step3 = subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
