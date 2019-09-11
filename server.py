@@ -118,19 +118,17 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
-    wav_norm_trimmed = trim_silence(wav_norm)
-
     timestamp = str(time.time()).replace('.', '-')
-    
     tmp_dir = tmp_location + '/' + speaker + '-' + timestamp
     subprocess.call(["mkdir", tmp_dir])
     tmp_fpath = tmp_dir + '/' + speaker + '-' + timestamp + '.wav'
-    librosa.output.write_wav(tmp_fpath, wav_norm_trimmed.astype(np.float32), synthesizer.sample_rate)
+    librosa.output.write_wav(tmp_fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
 
     # WIP
     denoise_output(rnnoise_script_location, tmp_dir, tmp_fpath)
 
+    wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
+    wav_norm_trimmed = trim_silence(wav_norm)
     out = io.BytesIO()
     wavfile.write(out, synthesizer.sample_rate, wav_norm_trimmed.astype(np.int16))
 
