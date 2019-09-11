@@ -114,6 +114,9 @@
             <select id="speakers" name="speakers"></select>
           </div>
           <div class="input-row">
+            <input id="denoise" type="checkbox" name="denoise" value="True"> Denoise Output <br>
+          </div>
+          <div class="input-row">
             <input id="text" placeholder="Enter text" size=45 type="text" name="text">
             <div id="clear-text-button" name="clear">X</div>
           </div>
@@ -169,6 +172,7 @@
       function triggerSynthesize() {
         text = q('#text').value
         selectedSpeaker = q('#speakers').selectedOptions[0].value
+        denoise = q('#denoise').checked
         // model_selected = $('#models').data('selectedModel')
         if (text && selectedSpeaker) {
           // q('#deepak-portrait').style.cursor = 'not-allowed'
@@ -177,7 +181,7 @@
           q('#loading-spinner').hidden = false
           q('#audio').hidden = true
           q('#audio').muted = false
-          synthesize(text, selectedSpeaker)
+          synthesize(text, selectedSpeaker, denoise)
         }
       }
       q('#clear-text-button').addEventListener('click', function(e) {
@@ -221,9 +225,10 @@
                       replace(/</g, 'ᐸ').
                       replace(/>/g, 'ᐳ');
       };
-      function synthesize(text, selectedSpeaker) {
+      function synthesize(text, selectedSpeaker, denoise) {
         // model_selected = $('#models').data('selectedModel')
-        options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker + '&denoise=True'
+        console.log("denoise: ", denoise)
+        options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker
         fetch_str = '/api/tts?' + options_str
         fetch(fetch_str, {cache: 'no-cache'})
           .then(function(res) {
