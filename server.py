@@ -117,7 +117,7 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    if denoise:
+    if (denoise == 'True'):
         timestamp = str(time.time()).replace('.', '-')
         tmp_dir = tmp_location + '/' + speaker + '-' + timestamp
         subprocess.call(["mkdir", tmp_dir])

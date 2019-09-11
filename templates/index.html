@@ -114,7 +114,8 @@
             <select id="speakers" name="speakers"></select>
           </div>
           <div class="input-row">
-            <input id="denoise" type="checkbox" name="denoise" value="True"> Denoise Output <br>
+            <label for="denoise">Denoise Synthesis Output</label>
+            <input id="denoise" type="checkbox" name="denoise" value="True">
           </div>
           <div class="input-row">
             <input id="text" placeholder="Enter text" size=45 type="text" name="text">
@@ -226,9 +227,12 @@
                       replace(/>/g, 'ᐳ');
       };
       function synthesize(text, selectedSpeaker, denoise) {
-        // model_selected = $('#models').data('selectedModel')
-        console.log("denoise: ", denoise)
         options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker
+        if (denoise) {
+          options_str = options_str + '&denoise=True'
+        } else {
+          options_str = options_str + '&denoise=False'
+        }
         fetch_str = '/api/tts?' + options_str
         fetch(fetch_str, {cache: 'no-cache'})
           .then(function(res) {
