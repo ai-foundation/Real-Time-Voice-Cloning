@@ -59,15 +59,13 @@ def trim_silence(y):
 def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
     print("========> Beginning denoise process...")
     raw_pcm_location = tmp_dir + "/raw.pcm"
-    step1 = subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
-    print(step1)
+    subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
     rnnoise = "." + rnnoise_script_location
     denoised_pcm_location = tmp_dir + "/denoised.pcm"
-    step2 = subprocess.call(["sh", rnnoise_script_location, raw_pcm_location, denoised_pcm_location])
-    print(step2)
+    subprocess.call(["sh", rnnoise_script_location, raw_pcm_location, denoised_pcm_location])
     denoised_wav_location = tmp_dir + "/denoised.wav"
-    step3 = subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
-    print(step3)
+    subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
+    return denoised_wav_location
 
 #####################################################################################
 #  Define server and other global variables
@@ -106,6 +104,7 @@ def speakers():
 def tts():
     text = request.args.get('text')
     speaker = request.args.get('speaker')
+    denoise = request.args.get('denoise')
 
     # - Load the speaker embedding:
     texts = [text]
@@ -118,21 +117,22 @@ def tts():
     generated_wav = vocoder.infer_waveform(spec)
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")
 
-    timestamp = str(time.time()).replace('.', '-')
-    tmp_dir = tmp_location + '/' + speaker + '-' + timestamp
-    subprocess.call(["mkdir", tmp_dir])
-    tmp_fpath = tmp_dir + '/' + speaker + '-' + timestamp + '.wav'
-    librosa.output.write_wav(tmp_fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
-
-    # WIP
-    denoise_output(rnnoise_script_location, tmp_dir, tmp_fpath)
+    if denoise:
+        timestamp = str(time.time()).replace('.', '-')
+        tmp_dir = tmp_location + '/' + speaker + '-' + timestamp
+        subprocess.call(["mkdir", tmp_dir])
+        tmp_fpath = tmp_dir + '/' + speaker + '-' + timestamp + '.wav'
+        librosa.output.write_wav(tmp_fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
+        
+        # WIP
+        denoised_output_fpath = denoise_output(rnnoise_script_location, tmp_dir, tmp_fpath)
+        y, sr = librosa.load(denoised_output_fpath, sr=16000)
+        generated_wav = y
 
     wav_norm = generated_wav * (32767 / max(0.01, np.max(np.abs(generated_wav))))
     wav_norm_trimmed = trim_silence(wav_norm)
     out = io.BytesIO()
     wavfile.write(out, synthesizer.sample_rate, wav_norm_trimmed.astype(np.int16))
-
-
 
     data64 = base64.b64encode(out.getvalue()).decode()
     return jsonify({ "wav64": data64, "text": text })

@@ -223,7 +223,7 @@
       };
       function synthesize(text, selectedSpeaker) {
         // model_selected = $('#models').data('selectedModel')
-        options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker
+        options_str = '&text=' + encodeURIComponent(text) + '&speaker=' + selectedSpeaker + '&denoise=True'
         fetch_str = '/api/tts?' + options_str
         fetch(fetch_str, {cache: 'no-cache'})
           .then(function(res) {
