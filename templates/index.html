@@ -108,6 +108,10 @@
             <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
             <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
           </div>
+          <div class="input-row">
+            <label for="new-speaker-name">New Speaker Name</label>
+            <input type="text" id="new-speaker-name" name="new-speaker-name" placeholder="Enter new speaker name">
+          </div>
           <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           <div>Select a Speaker</div>
           <div class="input-row">
@@ -149,7 +153,7 @@
           console.log("reader.onload: ", e.target.result)
           var arrayBuffer = reader.result
           console.log("arrayBuffer", arrayBuffer)
-	  audioArrayBuffer = arrayBuffer
+	        audioArrayBuffer = arrayBuffer
           // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
           // console.log("decodedAudioData", arrayBuffer)
         }
@@ -161,12 +165,12 @@
         var typedArray = new Float32Array(decoded.length)
         typedArray = decoded.getChannelData(0)
         console.log("typedArray: ", typedArray)
-	audioTypedArray = typedArray
+	      audioTypedArray = typedArray
       }
 
       function trainNewSpeaker() {
-	post_str = '/api/train'
-	
+	      post_str = '/api/train'
+        
       }
 
       function fetchSpeakers() {
@@ -210,13 +214,17 @@
       })
 
       q('#upload-audio').addEventListener('change', function(e) {
-	console.log("upload event: ", e)
-	var file = e.target.files[0]
+	      console.log("upload event: ", e) 
+	      var file = e.target.files[0]
         uploadAudioFile(file)
       })
 
       q('#upload').addEventListener('click', function(e) {
-	trainNewSpeaker()
+	      trainNewSpeaker()
+      })
+
+      q('#new-speaker-name').addEventListener('change', function(e) {
+        console.log(q('#new-speaker-name').val())
       })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //

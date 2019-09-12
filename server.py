@@ -92,13 +92,13 @@ def speakers():
     return jsonify({ "speakers": speakers })
 
 # TODO: route for new speaker
-# @app.route('/api/train', methods=['POST'])
-# def train():
-#     speaker = request.args.get('speaker')
-#     data = request.args.get('data')
-#     if (len(speaker) > 0 and data):
-#         print(speaker)
-#         print(data)
+@app.route('/api/train', methods=['POST'])
+def train():
+    speaker = request.args.get('speaker')
+    data = request.args.get('data')
+    if (len(speaker) > 0 and data):
+        print(speaker)
+        print(data)
 
 @app.route('/api/tts', methods=['GET'])
 def tts():
