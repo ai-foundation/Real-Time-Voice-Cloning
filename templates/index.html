@@ -223,8 +223,8 @@
 	      trainNewSpeaker()
       })
 
-      q('#new-speaker-name').addEventListener('change', function(e) {
-        console.log(q('#new-speaker-name').val())
+      q('#new-speaker-name').addEventListener('input', function(e) {
+        console.log(q('#new-speaker-name').value)
       })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
