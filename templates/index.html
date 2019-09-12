@@ -137,25 +137,36 @@
       function q(selector) { return document.querySelector(selector) }
       q('#text').focus()
 
-      function uploadAndTrain() {
+      // File reader array buffer global var
+      var audioTypedArray = null
+      var audioArrayBuffer = null
+
+      function uploadAudioFile(f) {
         const reader = new FileReader()
         const audioContext = new AudioContext()
 
         reader.onload = function (e) {
-          console.log("e.target:" ,e.target)
+          console.log("reader.onload: ", e.target.result)
           var arrayBuffer = reader.result
           console.log("arrayBuffer", arrayBuffer)
-          audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
-          console.log("decodedAudioData", arrayBuffer)
+	  audioArrayBuffer = arrayBuffer
+          // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
+          // console.log("decodedAudioData", arrayBuffer)
         }
 
-        reader.readAsArrayBuffer(input.files[0])
+        reader.readAsArrayBuffer(f)
       }
 
       function onDecodeAudioData(decoded) {
         var typedArray = new Float32Array(decoded.length)
         typedArray = decoded.getChannelData(0)
         console.log("typedArray: ", typedArray)
+	audioTypedArray = typedArray
+      }
+
+      function trainNewSpeaker() {
+	post_str = '/api/train'
+	
       }
 
       function fetchSpeakers() {
@@ -198,8 +209,14 @@
         triggerSynthesize()
       })
 
+      q('#upload-audio').addEventListener('change', function(e) {
+	console.log("upload event: ", e)
+	var file = e.target.files[0]
+        uploadAudioFile(file)
+      })
+
       q('#upload').addEventListener('click', function(e) {
-        uploadAndTrain()
+	trainNewSpeaker()
       })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
