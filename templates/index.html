@@ -171,7 +171,7 @@
       function trainNewSpeaker() {
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName
-        post_str = '/api/train' + options_str
+        post_str = '/api/train?' + options_str
         audioData = { data: audioArrayBuffer }
         postData(post_str, audioData)
       }
