@@ -97,8 +97,8 @@ def train():
     speaker = request.args.get('speaker')
     print(speaker)
 
-    data = request.json
-    print(data)
+    payload = request.data
+    print(payload)
 
     return jsonify({"status": "ok"})
 

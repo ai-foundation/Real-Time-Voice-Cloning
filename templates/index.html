@@ -153,7 +153,7 @@
           console.log("reader.onload: ", e.target.result)
           var arrayBuffer = reader.result
           console.log("arrayBuffer", arrayBuffer)
-	  audioArrayBlob = new Blob([arrayBuffer])
+	        audioArrayBlob = new Blob([arrayBuffer])
           // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
           // console.log("decodedAudioData", arrayBuffer)
         }
@@ -172,10 +172,10 @@
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName
         post_str = '/api/train?' + options_str
-	console.log("in trainNewSpeaker")
-	console.log(audioArrayBlob)
+	      console.log("in trainNewSpeaker")
+	      console.log(audioArrayBlob)
         audioData = { data: audioArrayBlob }
-	console.log(audioData)
+	      console.log(audioData)
         postData(post_str, audioData)
       }
 
@@ -229,9 +229,9 @@
 	      trainNewSpeaker()
       })
 
-      q('#new-speaker-name').addEventListener('input', function(e) {
-        console.log(q('#new-speaker-name').value)
-      })
+      // q('#new-speaker-name').addEventListener('input', function(e) {
+      //   console.log(q('#new-speaker-name').value)
+      // })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
       function b64toBlob(b64Data, contentType='', sliceSize=512) {
@@ -294,14 +294,10 @@
 
       function postData(url, data) {
 	      console.log("in postData")
-		console.log(data)
-		// console.log(JSON.stringify(data))
+    		console.log(data)
         return fetch(url, {
           method: 'POST',
           cache: 'no-cache',
-          //headers: {
-          //  'Content-Type': 'application/json'
-          //},
           body: data,
         })
         .then(resp => console.log("post response: ", resp))
