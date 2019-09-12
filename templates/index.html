@@ -104,11 +104,11 @@
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div id="models"></div>
-          <!-- <div class="input-row">
+          <div class="input-row">
             <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
             <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
           </div>
-          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button> -->
+          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           <div>Select a Speaker</div>
           <div class="input-row">
             <select id="speakers" name="speakers"></select>
@@ -135,20 +135,28 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
     <script>
       function q(selector) { return document.querySelector(selector) }
-      // select obama model as default
-      // q('#deepak-portrait').style.opacity = '0.2'
-      // $('#models').data('selectedModel', 'Obama (fast)')
       q('#text').focus()
 
-      // function uploadAndTrain() {
-      //   const reader = new FileReader()
+      function uploadAndTrain() {
+        const reader = new FileReader()
+        const audioContext = new AudioContext()
 
-      //   reader.onload = function (e) {
-      //     console.log(e.target)
-      //   }
+        reader.onload = function (e) {
+          console.log("e.target:" ,e.target)
+          var arrayBuffer = reader.result
+          console.log("arrayBuffer", arrayBuffer)
+          audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
+          console.log("decodedAudioData", arrayBuffer)
+        }
 
-      //   // reader.readAsArrayBuffer(audioBlob)
-      // }
+        reader.readAsArrayBuffer(input.files[0])
+      }
+
+      function onDecodeAudioData(decoded) {
+        var typedArray = new Float32Array(decoded.length)
+        typedArray = decoded.getChannelData(0)
+        console.log("typedArray: ", typedArray)
+      }
 
       function fetchSpeakers() {
         fetch_str = '/api/speakers'
@@ -174,10 +182,7 @@
         text = q('#text').value
         selectedSpeaker = q('#speakers').selectedOptions[0].value
         denoise = q('#denoise').checked
-        // model_selected = $('#models').data('selectedModel')
         if (text && selectedSpeaker) {
-          // q('#deepak-portrait').style.cursor = 'not-allowed'
-          // q('#obama-portrait').style.cursor = 'not-allowed'
           q('#synthesize').hidden = true
           q('#loading-spinner').hidden = false
           q('#audio').hidden = true
