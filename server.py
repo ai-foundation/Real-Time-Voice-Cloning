@@ -100,6 +100,10 @@ def train():
     payload = request.data
     print(payload)
 
+    f = open('/home/jonathan/voice-clips/upload-test.wav', 'wb')
+    f.write(payload)
+    f.close()
+
     return jsonify({"status": "ok"})
 
 @app.route('/api/tts', methods=['GET'])
