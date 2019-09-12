@@ -153,7 +153,8 @@
           console.log("reader.onload: ", e.target.result)
           var arrayBuffer = reader.result
           console.log("arrayBuffer", arrayBuffer)
-	        audioArrayBlob = new Blob([arrayBuffer])
+          var uint8array = new Uint8Array(arrayBuffer)
+	        audioArrayBlob = new Blob([uint8array])
           // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
           // console.log("decodedAudioData", arrayBuffer)
         }
