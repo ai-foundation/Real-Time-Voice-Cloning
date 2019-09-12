@@ -169,8 +169,11 @@
       }
 
       function trainNewSpeaker() {
-	      post_str = '/api/train'
-        
+        newSpeakerName = q('#new-speaker-name').value
+        options_str = '&speaker=' + newSpeakerName
+        post_str = '/api/train' + options_str
+        audioData = { data: audioArrayBuffer }
+        postData(post_str, audioData)
       }
 
       function fetchSpeakers() {
@@ -284,6 +287,18 @@
             q('#loading-spinner').hidden = true
             q('#synthesize').hidden = false
           })
+      }
+
+      function postData(url, data = {}) {
+        return fetch(url, {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(resp => console.log("post response: ", resp))
       }
     </script>
   </body>
