@@ -143,7 +143,7 @@
 
       // File reader array buffer global var
       var audioTypedArray = null
-      var audioArrayBuffer = null
+      var audioArrayBlob = null
 
       function uploadAudioFile(f) {
         const reader = new FileReader()
@@ -153,7 +153,7 @@
           console.log("reader.onload: ", e.target.result)
           var arrayBuffer = reader.result
           console.log("arrayBuffer", arrayBuffer)
-	        audioArrayBuffer = arrayBuffer
+	  audioArrayBlob = new Blob([arrayBuffer])
           // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
           // console.log("decodedAudioData", arrayBuffer)
         }
@@ -172,7 +172,10 @@
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName
         post_str = '/api/train?' + options_str
-        audioData = { data: audioArrayBuffer }
+	console.log("in trainNewSpeaker")
+	console.log(audioArrayBlob)
+        audioData = { data: audioArrayBlob }
+	console.log(audioData)
         postData(post_str, audioData)
       }
 
@@ -289,14 +292,17 @@
           })
       }
 
-      function postData(url, data = {}) {
+      function postData(url, data) {
+	      console.log("in postData")
+		console.log(data)
+		// console.log(JSON.stringify(data))
         return fetch(url, {
           method: 'POST',
           cache: 'no-cache',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+          //headers: {
+          //  'Content-Type': 'application/json'
+          //},
+          body: data,
         })
         .then(resp => console.log("post response: ", resp))
       }
