@@ -96,9 +96,9 @@ def speakers():
 def train():
     speaker = request.args.get('speaker')
     data = request.args.get('data')
-    if (len(speaker) > 0 and data):
-        print(speaker)
-        print(data)
+    print(speaker)
+    print(data)
+    return jsonify({"status": "ok"})
 
 @app.route('/api/tts', methods=['GET'])
 def tts():
