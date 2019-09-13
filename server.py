@@ -57,7 +57,6 @@ def trim_silence(y):
     return yhat
 
 def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
-    print("========> Beginning denoise process...")
     raw_pcm_location = tmp_dir + "/raw.pcm"
     subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
     rnnoise = "." + rnnoise_script_location
@@ -113,11 +112,10 @@ def train():
     if (useDemoScript == 'True'):
         useDemoScript = True
     
-    print(request.files)
-    file = request.files['file']
+    audioFile = request.files['audioFile']
     # # TODO: ALLOWED FILES METHOD
-    if file:
-        file.save(voice_clips_location + '/' + filename)
+    if audioFile:
+        audioFile.save(voice_clips_location + '/' + filename)
         create_new_speaker_embedding(speaker, filename, useDemoScript)
         return jsonify({"status": "ok"})
 
