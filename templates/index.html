@@ -185,7 +185,8 @@
         var formdata = new FormData()
         var fileInput = q('#upload-audio')
         console.log(fileInput.files[0])
-        formdata.append(fileInput.files[0].name, fileInput.files[0])
+        // formdata.append(fileInput.files[0].name, fileInput.files[0])
+        formdata.append('file', fileInput.files[0])
 
         var xhr = new XMLHttpRequest()
         var url = encodeURI(post_str)

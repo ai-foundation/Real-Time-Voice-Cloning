@@ -106,9 +106,11 @@ def train():
 
     # file = request.files['file']
     print(request.files)
+    file = request.files['file']
     # # TODO: ALLOWED FILES METHOD
-    # if file:
-    #     file.save('/home/jonathan/voice-clips/upload-test.wav')
+    if file:
+        print(file)
+        file.save('/home/jonathan/voice-clips/upload-test.wav')
 
     return jsonify({"status": "ok"})
 
