@@ -150,7 +150,7 @@
         var fileInput = q('#upload-audio')
         var useDemoScript = q('#use-demo-script').checked
         newSpeakerName = q('#new-speaker-name').value
-        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name + '&demo-script=' + str(useDemoScript)
+        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name
         if (useDemoScript) {
           options_str = options_str + '&demo-script=True'
         }
