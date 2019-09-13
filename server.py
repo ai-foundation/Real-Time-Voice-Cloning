@@ -67,10 +67,14 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
     subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
     return denoised_wav_location
 
-# TODO: option to include transcript
-def create_new_speaker_embedding(speaker, filename):
-    subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
-    "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True" ])
+# TODO: option to include custom transcript instead of only demo script
+def create_new_speaker_embedding(speaker, filename, useDemoScript):
+    if useDemoScript:
+        subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
+        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "" ])
+    else:
+        subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
+        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt" ])
 
 #####################################################################################
 #  Define server and other global variables
@@ -105,13 +109,16 @@ def train():
     print(speaker)
     filename = request.args.get('filename')
     print(filename)
+    useDemoScript = request.args.get('demo-script')
+    if (useDemoScript == 'True'):
+        useDemoScript = True
     
     print(request.files)
     file = request.files['file']
     # # TODO: ALLOWED FILES METHOD
     if file:
         file.save(voice_clips_location + '/' + filename)
-        create_new_speaker_embedding(speaker, filename)
+        create_new_speaker_embedding(speaker, filename, useDemoScript)
         return jsonify({"status": "ok"})
 
     abort(400, "Invalid audio file")

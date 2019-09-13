@@ -109,6 +109,10 @@
             <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
           </div>
           <div class="input-row">
+            <label for="use-demo-script">Use demo script</label>
+            <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
+          </div>
+          <div class="input-row">
             <label for="new-speaker-name">New Speaker Name</label>
             <input type="text" id="new-speaker-name" name="new-speaker-name" placeholder="Enter new speaker name">
           </div>
@@ -141,44 +145,16 @@
       function q(selector) { return document.querySelector(selector) }
       q('#text').focus()
 
-      // File reader array buffer global var
-      var audioTypedArray = null
-      var audioArrayBlob = null
-
-      function uploadAudioFile(f) {
-        // const reader = new FileReader()
-        // const audioContext = new AudioContext()
-
-        // reader.onload = function (e) {
-        //   console.log("reader.onload: ", e.target.result)
-        //   var arrayBuffer = reader.result
-        //   console.log("arrayBuffer", arrayBuffer)
-        //   var uint8array = new Uint8Array(arrayBuffer)
-	      //   audioArrayBlob = new Blob([uint8array])
-        //   // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
-        //   // console.log("decodedAudioData", arrayBuffer)
-        // }
-
-        // reader.readAsArrayBuffer(f)
-
-        var fileInput = q('#upload-audio')
-        console.log(fileInput.files[0])
-      }
-
-      function onDecodeAudioData(decoded) {
-        var typedArray = new Float32Array(decoded.length)
-        typedArray = decoded.getChannelData(0)
-        console.log("typedArray: ", typedArray)
-	      audioTypedArray = typedArray
-      }
-
       function trainNewSpeaker() {
         var formdata = new FormData()
         var fileInput = q('#upload-audio')
+        var useDemoScript = q('#use-demo-script').checked
         newSpeakerName = q('#new-speaker-name').value
-        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name
+        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name + '&demo-script=' + str(useDemoScript)
+        if (useDemoScript) {
+          options_str = options_str + '&demo-script=True'
+        }
         post_str = '/api/train?' + options_str
-        console.log(fileInput.files[0])
         formdata.append('file', fileInput.files[0])
 
         var xhr = new XMLHttpRequest()
@@ -227,19 +203,9 @@
         triggerSynthesize()
       })
 
-      q('#upload-audio').addEventListener('change', function(e) {
-	      console.log("upload event: ", e) 
-	      var file = e.target.files[0]
-        uploadAudioFile(file)
-      })
-
       q('#upload').addEventListener('click', function(e) {
 	      trainNewSpeaker()
       })
-
-      // q('#new-speaker-name').addEventListener('input', function(e) {
-      //   console.log(q('#new-speaker-name').value)
-      // })
     
       // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript //
       function b64toBlob(b64Data, contentType='', sliceSize=512) {
