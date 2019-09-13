@@ -71,10 +71,10 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
 def create_new_speaker_embedding(speaker, filename, useDemoScript):
     if useDemoScript:
         subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
-        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "" ])
+        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt"])
     else:
         subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
-        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt" ])
+        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True" ])
 
 #####################################################################################
 #  Define server and other global variables
