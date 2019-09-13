@@ -146,20 +146,24 @@
       var audioArrayBlob = null
 
       function uploadAudioFile(f) {
-        const reader = new FileReader()
-        const audioContext = new AudioContext()
+        // const reader = new FileReader()
+        // const audioContext = new AudioContext()
 
-        reader.onload = function (e) {
-          console.log("reader.onload: ", e.target.result)
-          var arrayBuffer = reader.result
-          console.log("arrayBuffer", arrayBuffer)
-          var uint8array = new Uint8Array(arrayBuffer)
-	        audioArrayBlob = new Blob([uint8array])
-          // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
-          // console.log("decodedAudioData", arrayBuffer)
-        }
+        // reader.onload = function (e) {
+        //   console.log("reader.onload: ", e.target.result)
+        //   var arrayBuffer = reader.result
+        //   console.log("arrayBuffer", arrayBuffer)
+        //   var uint8array = new Uint8Array(arrayBuffer)
+	      //   audioArrayBlob = new Blob([uint8array])
+        //   // audioContext.decodeAudioData(arrayBuffer, onDecodeAudioData)
+        //   // console.log("decodedAudioData", arrayBuffer)
+        // }
 
-        reader.readAsArrayBuffer(f)
+        // reader.readAsArrayBuffer(f)
+
+        var formdata = new FormData()
+        var fileInput = q('#upload-audio')
+        console.log(fileInput.files)
       }
 
       function onDecodeAudioData(decoded) {
