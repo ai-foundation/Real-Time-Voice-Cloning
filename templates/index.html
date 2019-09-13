@@ -110,13 +110,17 @@
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div class="train-speaker">
-            <div class="input-row">
-                <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
+              <div class="input-row">
+                <label for="upload-audio">Upload a short audio clip of the voice to be cloned (mp3, wav)</label>
                 <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
               </div>
-              <div class="input-row">
-                <label for="use-demo-script">Use demo script</label>
+              <!-- <div class="input-row">
+                <label for="use-demo-script">Use default demo script</label>
                 <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
+              </div> -->
+              <div class="input-row">
+                <label for="upload-transcript">Upload transcript (see transcript formatting rules</label>
+                <input type="file" id="upload-transcript" name="upload-transcript" accept="text/plain">
               </div>
               <div class="input-row">
                 <label for="new-speaker-name">New Speaker Name</label>
@@ -159,15 +163,25 @@
         q('#loading-spinner-train').hidden = false
 
         var formdata = new FormData()
-        var fileInput = q('#upload-audio')
+        var audioFileInput = q('#upload-audio')
+        var transcriptFileInput = q('#upload-transcript')
+
+        // todo: check to see if a transcript file was uploaded
+        // todo: remove the api argument for 'demo-script'
+
         var useDemoScript = q('#use-demo-script').checked
         newSpeakerName = q('#new-speaker-name').value
-        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name
-        if (useDemoScript) {
-          options_str = options_str + '&demo-script=True'
-        }
+        options_str = '&speaker=' + newSpeakerName + '&filename=' + audioFileInput.files[0].name
+        // if (useDemoScript) {
+        //   options_str = options_str + '&demo-script=True'
+        // }
         post_str = '/api/train?' + options_str
-        formdata.append('audioFile', fileInput.files[0])
+
+        formdata.append('audioFile', audioFileInput.files[0])
+
+        if (transcriptFileInput.files.length) {
+          formdata.append('transcript', transcriptFileInput.files[0])
+        }
 
         fetch(post_str, {
           body: formdata,
