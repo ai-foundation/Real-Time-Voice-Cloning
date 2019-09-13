@@ -94,6 +94,11 @@
         margin: 0 auto;
         width: 200px;
       }
+
+      .train-speaker {
+        margin-bottom: 50px;
+        background-color: lightgray;
+      }
     </style>
   </head>
   
@@ -103,20 +108,22 @@
       <div class="row">
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
-          <div id="models"></div>
-          <div class="input-row">
-            <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
-            <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
+          <div class="train-speaker">
+            <div class="input-row">
+                <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
+                <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
+              </div>
+              <div class="input-row">
+                <label for="use-demo-script">Use demo script</label>
+                <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
+              </div>
+              <div class="input-row">
+                <label for="new-speaker-name">New Speaker Name</label>
+                <input type="text" id="new-speaker-name" name="new-speaker-name" placeholder="Enter new speaker name">
+              </div>
+              <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           </div>
-          <div class="input-row">
-            <label for="use-demo-script">Use demo script</label>
-            <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
-          </div>
-          <div class="input-row">
-            <label for="new-speaker-name">New Speaker Name</label>
-            <input type="text" id="new-speaker-name" name="new-speaker-name" placeholder="Enter new speaker name">
-          </div>
-          <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
+
           <div>Select a Speaker</div>
           <div class="input-row">
             <select id="speakers" name="speakers"></select>
