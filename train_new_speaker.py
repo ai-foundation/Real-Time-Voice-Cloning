@@ -136,7 +136,10 @@ if __name__ == '__main__':
                     '-speaker', '--speaker_name', type=str, help='name of speaker for embedding')
     parser.add_argument(
                     '-transcript', '--transcript_fpath', type=str, help='path to audio clip transcript')
-    
+    parser.add_argument(
+                    '-api', '--from_api', type=str, help='boolean whether script was called from api')
+
+
     args = parser.parse_args()
     print_args(args, parser)
     config = load_config(args.config_path)
@@ -144,9 +147,9 @@ if __name__ == '__main__':
     embeddings_location = config.embeddings_location
     voice_clips_location = config.voice_clips_location
 
-    confirm_parameters(args.speaker_name, args.audio_fpath)
-
-    system_check()
+    if (!args.from_api):
+        confirm_parameters(args.speaker_name, args.audio_fpath)
+        system_check()
 
     print("Preparing the encoder...")
     encoder.load_model(args.enc_model_fpath)
