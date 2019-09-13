@@ -187,7 +187,8 @@
 
         fetch(post_str, {
           body: formdata,
-          method: "post"
+          method: "post",
+          cache: 'no-cache'
         })
         .then(function(res) {
           console.log("first then")
