@@ -183,6 +183,8 @@
           formdata.append('transcript', transcriptFileInput.files[0])
         }
 
+        console.log("formdata", formdata)
+
         fetch(post_str, {
           body: formdata,
           method: "post"
