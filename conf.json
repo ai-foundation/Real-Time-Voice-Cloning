@@ -6,5 +6,6 @@
   "embeddings_location": "/home/jonathan/voice-cloning-embeddings",
   "voice_clips_location": "/home/jonathan/voice-clips",
   "tmp_location": "/home/jonathan/rt-voice-cloning-tmp",
-  "rnnoise_script_location": "/home/jonathan/rnnoise/examples/rnnoise_demo"
+  "rnnoise_script_location": "/home/jonathan/rnnoise/examples/rnnoise_demo",
+  "train_new_speaker_script_location": "/home/jonathan/Real-Time-Voice-Cloning/train_new_speaker.py"
 }

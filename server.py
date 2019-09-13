@@ -10,7 +10,7 @@ import argparse
 import torch
 import sys
 from flask import Flask, Response, request, render_template, send_file, url_for
-from flask import jsonify
+from flask import jsonify, abort
 import re
 import json
 import base64
@@ -67,6 +67,11 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
     subprocess.call(["ffmpeg", "-f", "s16le", "-ar", "16k", "-ac", "1", "-i", denoised_pcm_location, denoised_wav_location])
     return denoised_wav_location
 
+# TODO: option to include transcript
+def create_new_speaker_embedding(speaker, filename):
+    subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
+    "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename ])
+
 #####################################################################################
 #  Define server and other global variables
 #####################################################################################
@@ -75,6 +80,8 @@ embeddings_location = ''
 saved_embeddings = ''
 tmp_location = ''
 rnnoise_script_location = ''
+voice_clips_location = ''
+train_new_speaker_script_location = ''
 app = Flask(__name__)
 
 #####################################################################################
@@ -96,23 +103,18 @@ def speakers():
 def train():
     speaker = request.args.get('speaker')
     print(speaker)
-
-    # payload = request.data
-    # print(payload)
-
-    # f = open('/home/jonathan/voice-clips/upload-test.wav', 'wb')
-    # f.write(payload)
-    # f.close()
-
-    # file = request.files['file']
+    filename = request.args.get('filename')
+    print(filename)
+    
     print(request.files)
     file = request.files['file']
     # # TODO: ALLOWED FILES METHOD
     if file:
-        print(file)
-        file.save('/home/jonathan/voice-clips/upload-test.wav')
+        file.save(voice_clips_location + '/' + filename)
+        create_new_speaker_embedding(speaker, filename)
+        return jsonify({"status": "ok"})
 
-    return jsonify({"status": "ok"})
+    abort(400, "Invalid audio file")
 
 @app.route('/api/tts', methods=['GET'])
 def tts():
@@ -138,7 +140,6 @@ def tts():
         tmp_fpath = tmp_dir + '/' + speaker + '-' + timestamp + '.wav'
         librosa.output.write_wav(tmp_fpath, generated_wav.astype(np.float32), synthesizer.sample_rate)
         
-        # WIP
         denoised_output_fpath = denoise_output(rnnoise_script_location, tmp_dir, tmp_fpath)
         y, sr = librosa.load(denoised_output_fpath, sr=16000)
         generated_wav = y
@@ -182,6 +183,8 @@ if __name__ == '__main__':
     embeddings_location = config.embeddings_location
     tmp_location = config.tmp_location
     rnnoise_script_location = config.rnnoise_script_location
+    voice_clips_location = config.voice_clips_location
+    train_new_speaker_script_location = config.train_new_speaker_script_location
     saved_embeddings = get_saved_embedding_names()
 
     ## Print some environment information (for debugging purposes)
