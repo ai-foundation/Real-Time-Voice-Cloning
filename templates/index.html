@@ -114,12 +114,8 @@
                 <label for="upload-audio">Upload a short audio clip of the voice to be cloned (mp3, wav)</label>
                 <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
               </div>
-              <!-- <div class="input-row">
-                <label for="use-demo-script">Use default demo script</label>
-                <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
-              </div> -->
               <div class="input-row">
-                <label for="upload-transcript">Upload transcript (see transcript formatting rules</label>
+                <label for="upload-transcript">Upload transcript (see transcript formatting rules below)</label>
                 <input type="file" id="upload-transcript" name="upload-transcript" accept="text/plain">
               </div>
               <div class="input-row">
@@ -149,6 +145,23 @@
           <image class="spinner" id="loading-spinner" src="/static/images/spinner.gif" hidden/>
         </div>
       </div>
+      <div class="row">
+        <h4>Audio Transcript Rules</h4>
+        <ui>
+          <li>Transcript must be a plain text file (ie: transcript.txt)</li>
+          <li>The transcript is used for forced alignment and breaking the audio clip into shorter clips. Each shorter clip should be around 5 seconds long</li>
+          <li>Each line of text in the transcript denotes a "short clip" of the audio file</li>
+          <li>Each line of text must be right after each other, with no extra newlines in between</li>
+        </ui>
+        <div>Example transcript file</div>
+        <code>
+          >once upon a time there was a kingdom with no king
+          >who makes the laws a boy asked his mother, she was getting ready to take eggs to market
+          >we make our own his mother said and are better off for it then they headed to the market
+          >suddenly a man ripped the egg basket away you can't the boy cried and he threw a fist
+          >the man pushed the child away and said who made you king
+        </code>
+      </div>
     </div>
 
     <!-- Bootstrap core JavaScript -->
@@ -166,15 +179,8 @@
         var audioFileInput = q('#upload-audio')
         var transcriptFileInput = q('#upload-transcript')
 
-        // todo: check to see if a transcript file was uploaded
-        // todo: remove the api argument for 'demo-script'
-
-        // var useDemoScript = q('#use-demo-script').checked
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName + '&filename=' + audioFileInput.files[0].name
-        // if (useDemoScript) {
-        //   options_str = options_str + '&demo-script=True'
-        // }
         post_str = '/api/train?' + options_str
 
         formdata.append('audioFile', audioFileInput.files[0])
@@ -183,16 +189,12 @@
           formdata.append('transcript', transcriptFileInput.files[0])
         }
 
-        console.log("formdata", formdata)
-
         fetch(post_str, {
           body: formdata,
           method: "post",
           cache: 'no-cache'
         })
         .then(function(res) {
-          console.log("first then")
-          console.log(res)
           if (!res.ok) throw Error(res.statusText)
             return res.json()
         })
