@@ -97,12 +97,17 @@ def train():
     speaker = request.args.get('speaker')
     print(speaker)
 
-    payload = request.data
-    print(payload)
+    # payload = request.data
+    # print(payload)
 
-    f = open('/home/jonathan/voice-clips/upload-test.wav', 'wb')
-    f.write(payload)
-    f.close()
+    # f = open('/home/jonathan/voice-clips/upload-test.wav', 'wb')
+    # f.write(payload)
+    # f.close()
+
+    file = request.files['file']
+    # TODO: ALLOWED FILES METHOD
+    if file:
+        file.save('/home/jonathan/voice-clips/upload-test.wav')
 
     return jsonify({"status": "ok"})
 

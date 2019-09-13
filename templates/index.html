@@ -161,9 +161,8 @@
 
         // reader.readAsArrayBuffer(f)
 
-        var formdata = new FormData()
         var fileInput = q('#upload-audio')
-        console.log(fileInput.files)
+        console.log(fileInput.files[0])
       }
 
       function onDecodeAudioData(decoded) {
@@ -177,11 +176,21 @@
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName
         post_str = '/api/train?' + options_str
-	      console.log("in trainNewSpeaker")
-	      console.log(audioArrayBlob)
-        audioData = { data: audioArrayBlob }
-	      console.log(audioData)
-        postData(post_str, audioData)
+	      // console.log("in trainNewSpeaker")
+	      // console.log(audioArrayBlob)
+        // audioData = { data: audioArrayBlob }
+	      // console.log(audioData)
+        // postData(post_str, audioData)
+
+        var formdata = new FormData()
+        var fileInput = q('#upload-audio')
+        console.log(fileInput.files[0])
+        formdata.append(fileInput.files[0].name, fileInput.files[0])
+
+        var xhr = new XMLHttpRequest()
+        var url = encodeURI(post_str)
+        xhr.open('POST', url)
+        xhr.send(formdata)
       }
 
       function fetchSpeakers() {
