@@ -16,7 +16,7 @@ import json
 import base64
 from scipy.io import wavfile
 import io
-from os import listdir
+from os import listdir, remove
 from os.path import isfile, join
 import time
 import subprocess
@@ -126,7 +126,7 @@ def train():
         create_new_speaker_embedding(speaker, filename, transcriptFileLocation)
 
         if transcriptFile:
-            os.remove(transcriptFileLocation)
+            remove(transcriptFileLocation)
 
         return jsonify({"status": "ok"})
 
