@@ -123,8 +123,8 @@
                 <input type="text" id="new-speaker-name" name="new-speaker-name" placeholder="Enter new speaker name">
               </div>
               <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
-              <image class="spinner" id="loading-spinner-train" src="/static/images/spinner.gif" hidden/>
           </div>
+          <image class="spinner" id="loading-spinner-train" src="/static/images/spinner.gif" hidden/>
 
           <div>Select a Speaker</div>
           <div class="input-row">
@@ -169,18 +169,22 @@
         post_str = '/api/train?' + options_str
         formdata.append('audioFile', fileInput.files[0])
 
-        // TODO: switch XML out for fetch so it's easier to use promises
-        // var xhr = new XMLHttpRequest()
-        // var url = encodeURI(post_str)
-        // xhr.open('POST', url)
-        // xhr.send(formdata)
-
         fetch(post_str, {
           body: formdata,
           method: "post"
         })
-        .then(function(resp) {
-          console.log("response from training: ", resp)
+        .then(function(res) {
+          console.log("first then")
+          console.log(res)
+          if (!res.ok) throw Error(res.statusText)
+            return res.json()
+        })
+        .then(function() {
+          fetchSpeakers()
+        })
+        .finally(function() {
+          q('#loading-spinner-train').hidden = true
+          q('#upload').hidden = false
         })
       }
 
@@ -194,6 +198,13 @@
           .then(function(data) {
             speakers = data["speakers"]
             var speakerSelect = q('#speakers')
+
+            var child = speakerSelect.firstElementChild
+            while (child) {
+              child.remove()
+              child = speakerSelect.firstElementChild
+            }
+
             for (var i=0; i<speakers.length; i++) {
               var option = document.createElement('option')
               option.text = option.value = speakers[i].split('.')[0]
