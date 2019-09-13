@@ -147,7 +147,7 @@ if __name__ == '__main__':
     embeddings_location = config.embeddings_location
     voice_clips_location = config.voice_clips_location
 
-    if (!args.from_api):
+    if (args.from_api is None):
         confirm_parameters(args.speaker_name, args.audio_fpath)
         system_check()
 

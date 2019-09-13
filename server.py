@@ -70,7 +70,7 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
 # TODO: option to include transcript
 def create_new_speaker_embedding(speaker, filename):
     subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
-    "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename ])
+    "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True" ])
 
 #####################################################################################
 #  Define server and other global variables
