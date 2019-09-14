@@ -16,7 +16,7 @@ import json
 import base64
 from scipy.io import wavfile
 import io
-from os import listdir
+from os import listdir, remove
 from os.path import isfile, join
 import time
 import subprocess
@@ -57,7 +57,6 @@ def trim_silence(y):
     return yhat
 
 def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
-    print("========> Beginning denoise process...")
     raw_pcm_location = tmp_dir + "/raw.pcm"
     subprocess.call(["ffmpeg", "-i", audio_fpath, "-f", "s16le", "-acodec", "pcm_s16le", raw_pcm_location])
     rnnoise = "." + rnnoise_script_location
@@ -68,13 +67,13 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
     return denoised_wav_location
 
 # TODO: option to include custom transcript instead of only demo script
-def create_new_speaker_embedding(speaker, filename, useDemoScript):
-    if useDemoScript:
-        subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
-        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=/home/jonathan/Real-Time-Voice-Cloning/demo_script.txt"])
-    else:
+def create_new_speaker_embedding(speaker, filename, transcriptFileLocation):
+    if not transcriptFileLocation:
         subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
         "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True" ])
+    else:
+        subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
+        "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=" + transcriptFileLocation])
 
 #####################################################################################
 #  Define server and other global variables
@@ -109,16 +108,26 @@ def train():
     print(speaker)
     filename = request.args.get('filename')
     print(filename)
-    useDemoScript = request.args.get('demo-script')
-    if (useDemoScript == 'True'):
-        useDemoScript = True
+    # useDemoScript = request.args.get('demo-script')
+    # if (useDemoScript == 'True'):
+    #     useDemoScript = True
+
+    transcriptFile = request.files['transcript']
+    transcriptFileLocation = ''
+    if transcriptFile:
+        transcriptFileName = speaker + '-' + filename + '-transcript.txt'
+        transcriptFileLocation = voice_clips_location + '/' + transcriptFileName
+        transcriptFile.save(transcriptFileLocation)
     
-    print(request.files)
-    file = request.files['file']
+    audioFile = request.files['audioFile']
     # # TODO: ALLOWED FILES METHOD
-    if file:
-        file.save(voice_clips_location + '/' + filename)
-        create_new_speaker_embedding(speaker, filename, useDemoScript)
+    if audioFile:
+        audioFile.save(voice_clips_location + '/' + filename)
+        create_new_speaker_embedding(speaker, filename, transcriptFileLocation)
+
+        if transcriptFile:
+            remove(transcriptFileLocation)
+
         return jsonify({"status": "ok"})
 
     abort(400, "Invalid audio file")

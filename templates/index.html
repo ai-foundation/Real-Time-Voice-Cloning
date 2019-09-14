@@ -98,7 +98,7 @@
       .train-speaker {
         margin-bottom: 50px;
         background-color: lightgray;
-		padding: 20px;
+		    padding: 20px;
       }
     </style>
   </head>
@@ -110,13 +110,13 @@
         <div class="col-lg-12 text-center">
           <h1 class="mt-5">AI Foundation Voice Cloning Engine</h1>
           <div class="train-speaker">
-            <div class="input-row">
-                <label for="upload-audio">Upload a short (6-10 seconds) audio clip of the voice to be cloned (mp3, wav, m4a, flac)</label>
+              <div class="input-row">
+                <label for="upload-audio">Upload a short audio clip of the voice to be cloned (mp3, wav)</label>
                 <input type="file" id="upload-audio" name="upload-audio" accept="audio/*">
               </div>
               <div class="input-row">
-                <label for="use-demo-script">Use demo script</label>
-                <input id="use-demo-script" type="checkbox" name="use-demo-script" value="True">
+                <label for="upload-transcript">Upload transcript (see transcript formatting rules below)</label>
+                <input type="file" id="upload-transcript" name="upload-transcript" accept="text/plain">
               </div>
               <div class="input-row">
                 <label for="new-speaker-name">New Speaker Name</label>
@@ -124,6 +124,7 @@
               </div>
               <button type="button" class="btn btn-primary" id="upload">Upload and Train</button>
           </div>
+          <image class="spinner" id="loading-spinner-train" src="/static/images/spinner.gif" hidden/>
 
           <div>Select a Speaker</div>
           <div class="input-row">
@@ -144,6 +145,15 @@
           <image class="spinner" id="loading-spinner" src="/static/images/spinner.gif" hidden/>
         </div>
       </div>
+      <div class="row">
+        <h4>Audio Transcript Rules</h4>
+        <ui>
+          <li>Transcript must be a plain text file (ie: transcript.txt)</li>
+          <li>The transcript is used for forced alignment and breaking the audio clip into shorter clips. Each shorter clip should be around 5 seconds long</li>
+          <li>Each line of text in the transcript denotes a "short clip" of the audio file</li>
+          <li>Each line of text must be right after each other, with no extra empty lines in between</li>
+        </ui>
+      </div>
     </div>
 
     <!-- Bootstrap core JavaScript -->
@@ -154,21 +164,39 @@
       q('#text').focus()
 
       function trainNewSpeaker() {
-        var formdata = new FormData()
-        var fileInput = q('#upload-audio')
-        var useDemoScript = q('#use-demo-script').checked
-        newSpeakerName = q('#new-speaker-name').value
-        options_str = '&speaker=' + newSpeakerName + '&filename=' + fileInput.files[0].name
-        if (useDemoScript) {
-          options_str = options_str + '&demo-script=True'
-        }
-        post_str = '/api/train?' + options_str
-        formdata.append('file', fileInput.files[0])
+        q('#upload').hidden = true
+        q('#loading-spinner-train').hidden = false
 
-        var xhr = new XMLHttpRequest()
-        var url = encodeURI(post_str)
-        xhr.open('POST', url)
-        xhr.send(formdata)
+        var formdata = new FormData()
+        var audioFileInput = q('#upload-audio')
+        var transcriptFileInput = q('#upload-transcript')
+
+        newSpeakerName = q('#new-speaker-name').value
+        options_str = '&speaker=' + newSpeakerName + '&filename=' + audioFileInput.files[0].name
+        post_str = '/api/train?' + options_str
+
+        formdata.append('audioFile', audioFileInput.files[0])
+
+        if (transcriptFileInput.files.length) {
+          formdata.append('transcript', transcriptFileInput.files[0])
+        }
+
+        fetch(post_str, {
+          body: formdata,
+          method: "post",
+          cache: 'no-cache'
+        })
+        .then(function(res) {
+          if (!res.ok) throw Error(res.statusText)
+            return res.json()
+        })
+        .then(function() {
+          fetchSpeakers()
+        })
+        .finally(function() {
+          q('#loading-spinner-train').hidden = true
+          q('#upload').hidden = false
+        })
       }
 
       function fetchSpeakers() {
@@ -181,6 +209,13 @@
           .then(function(data) {
             speakers = data["speakers"]
             var speakerSelect = q('#speakers')
+
+            var child = speakerSelect.firstElementChild
+            while (child) {
+              child.remove()
+              child = speakerSelect.firstElementChild
+            }
+
             for (var i=0; i<speakers.length; i++) {
               var option = document.createElement('option')
               option.text = option.value = speakers[i].split('.')[0]
@@ -272,17 +307,6 @@
             q('#loading-spinner').hidden = true
             q('#synthesize').hidden = false
           })
-      }
-
-      function postData(url, data) {
-	      console.log("in postData")
-    		console.log(data)
-        return fetch(url, {
-          method: 'POST',
-          cache: 'no-cache',
-          body: data,
-        })
-        .then(resp => console.log("post response: ", resp))
       }
     </script>
   </body>
