@@ -113,9 +113,9 @@ def train():
     # if (useDemoScript == 'True'):
     #     useDemoScript = True
 
+    transcriptFileLocation = ''
     if useTranscript:
         transcriptFile = request.files['transcript']
-        transcriptFileLocation = ''
         if transcriptFile:
             transcriptFileName = speaker + '-' + filename + '-transcript.txt'
             transcriptFileLocation = voice_clips_location + '/' + transcriptFileName
@@ -127,7 +127,7 @@ def train():
         audioFile.save(voice_clips_location + '/' + filename)
         create_new_speaker_embedding(speaker, filename, transcriptFileLocation)
 
-        if transcriptFile:
+        if transcriptFileLocation:
             remove(transcriptFileLocation)
 
         return jsonify({"status": "ok"})
