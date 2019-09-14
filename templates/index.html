@@ -173,14 +173,15 @@
 
         newSpeakerName = q('#new-speaker-name').value
         options_str = '&speaker=' + newSpeakerName + '&filename=' + audioFileInput.files[0].name
-        post_str = '/api/train?' + options_str
 
         formdata.append('audioFile', audioFileInput.files[0])
 
         if (transcriptFileInput.files.length) {
           formdata.append('transcript', transcriptFileInput.files[0])
+          options_str = options_str + '&transcript=True'
         }
 
+        post_str = '/api/train?' + options_str
         fetch(post_str, {
           body: formdata,
           method: "post",

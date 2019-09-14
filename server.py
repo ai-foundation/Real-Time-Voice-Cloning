@@ -108,16 +108,18 @@ def train():
     print(speaker)
     filename = request.args.get('filename')
     print(filename)
+    useTranscript = request.args.get('transcript')
     # useDemoScript = request.args.get('demo-script')
     # if (useDemoScript == 'True'):
     #     useDemoScript = True
 
-    transcriptFile = request.files['transcript']
-    transcriptFileLocation = ''
-    if transcriptFile:
-        transcriptFileName = speaker + '-' + filename + '-transcript.txt'
-        transcriptFileLocation = voice_clips_location + '/' + transcriptFileName
-        transcriptFile.save(transcriptFileLocation)
+    if useTranscript:
+        transcriptFile = request.files['transcript']
+        transcriptFileLocation = ''
+        if transcriptFile:
+            transcriptFileName = speaker + '-' + filename + '-transcript.txt'
+            transcriptFileLocation = voice_clips_location + '/' + transcriptFileName
+            transcriptFile.save(transcriptFileLocation)
     
     audioFile = request.files['audioFile']
     # # TODO: ALLOWED FILES METHOD
