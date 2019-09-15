@@ -91,7 +91,6 @@ app = Flask(__name__)
 #  API routes and handlers
 #####################################################################################
 
-# TODO: Add a UI for server
 @app.route('/')
 def index():
     return render_template('index.html', static_url_path='/static')
@@ -109,9 +108,6 @@ def train():
     filename = request.args.get('filename')
     print(filename)
     useTranscript = request.args.get('transcript')
-    # useDemoScript = request.args.get('demo-script')
-    # if (useDemoScript == 'True'):
-    #     useDemoScript = True
 
     transcriptFileLocation = ''
     if useTranscript:

@@ -88,6 +88,20 @@ def confirm_parameters(speaker, audio_fpath):
         print("Exiting...")
         sys.exit()
 
+def load_audio_file(audio_fpath):
+    split = audio_fpath.split('.')
+    ftype = split[len(split) - 1]
+    audio = None
+    if (ftype == 'wav'):
+        audio = AudioSegment.from_wav(audio_fpath)
+    elif (ftype == 'mp3'):
+        audio = AudioSegment.from_mp3(audio_fpath)
+    elif (ftype == 'ogg'):
+        audio = AudioSegment.from_ogg(audio_fpath)
+    elif (ftype == 'aac'):
+        audio = AudioSegment.from_aac(audio_fpath)
+    return audio
+
 def split_audio_into_clips(audio_fpath, speaker_name, transcript_fpath, voice_clips_location):
     # create Task object
     config = TaskConfiguration()
@@ -101,7 +115,10 @@ def split_audio_into_clips(audio_fpath, speaker_name, transcript_fpath, voice_cl
 
     print("===> Calculating force alignment ...")
     ExecuteTask(task).execute()
-    full_voice_clip = AudioSegment.from_wav(audio_fpath)
+    full_voice_clip = load_audio_file(audio_fpath)
+    if (full_voice_clip == None):
+        print('Unknown audio file extension')
+        sys.exit('Unknown audio file extension')
 
     os.mkdir(voice_clips_location + "/" + speaker_name, mode = 0o777)
 
