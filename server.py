@@ -68,16 +68,15 @@ def denoise_output(rnnoise_script_location, tmp_dir, audio_fpath):
 
 # TODO: option to include custom transcript instead of only demo script
 def create_new_speaker_embedding(speaker, filename, transcriptFileLocation):
+    status = 1
     if not transcriptFileLocation:
         status = subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
         "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True" ])
-        if (status != 0):
-            abort(400, "Error creating new speaker embedding")
     else:
         status = subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",
         "--speaker_name=" + speaker, "--audio_fpath=" + voice_clips_location + "/" + filename, "--from_api=True", "--transcript_fpath=" + transcriptFileLocation])
-        if (status != 0):
-            abort(400, "Error creating new speaker embedding")
+    if (status != 0):
+        abort(400, "Error creating new speaker embedding")
 
 #####################################################################################
 #  Define server and other global variables
