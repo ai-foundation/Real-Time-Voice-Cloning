@@ -93,13 +93,13 @@ def load_audio_file(audio_fpath):
     # ftype = split[len(split) - 1]
     ftype = audio_fpath.suffix
     audio = None
-    if (ftype == 'wav'):
+    if (ftype == '.wav'):
         audio = AudioSegment.from_wav(audio_fpath)
-    elif (ftype == 'mp3'):
+    elif (ftype == '.mp3'):
         audio = AudioSegment.from_mp3(audio_fpath)
-    elif (ftype == 'ogg'):
+    elif (ftype == '.ogg'):
         audio = AudioSegment.from_ogg(audio_fpath)
-    elif (ftype == 'aac'):
+    elif (ftype == '.aac'):
         audio = AudioSegment.from_aac(audio_fpath)
     return audio
 
