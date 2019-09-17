@@ -89,8 +89,9 @@ def confirm_parameters(speaker, audio_fpath):
         sys.exit()
 
 def load_audio_file(audio_fpath):
-    split = audio_fpath.split('.')
-    ftype = split[len(split) - 1]
+    # split = audio_fpath.suffix
+    # ftype = split[len(split) - 1]
+    ftype = audio_fpath.suffix
     audio = None
     if (ftype == 'wav'):
         audio = AudioSegment.from_wav(audio_fpath)
