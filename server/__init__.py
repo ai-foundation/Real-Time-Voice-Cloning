@@ -39,9 +39,9 @@ def initialize():
 
     ## Load the models one by one.
     print("Preparing the encoder, the synthesizer and the vocoder...")
-    encoder.load_model(config.enc_model_fpath)
-    synthesizer = Synthesizer(config.syn_model_dir.joinpath("taco_pretrained"), low_mem=False)
-    vocoder.load_model(config.voc_model_fpath)
+    encoder.load_model(Path(config.enc_model_fpath))
+    synthesizer = Synthesizer(Path(config.syn_model_fpath).joinpath("taco_pretrained"), low_mem=False)
+    vocoder.load_model(Path(config.voc_model_fpath))
 
     server_handler = ServerHandler(config, encoder, synthesizer, vocoder)
 
