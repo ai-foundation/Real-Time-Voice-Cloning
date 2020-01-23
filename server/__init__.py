@@ -12,36 +12,36 @@ from server.helpers import load_config, get_saved_embedding_names, print_cuda_de
 
 def initialize():
     print("Initializing fastsynth server...")
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="encoder/saved_models/pretrained.pt",
-                        help="Path to a saved encoder")
-    parser.add_argument("-s", "--syn_model_dir", type=Path, 
-                        default="synthesizer/saved_models/logs-pretrained/",
-                        help="Directory containing the synthesizer model")
-    parser.add_argument("-v", "--voc_model_fpath", type=Path, 
-                        default="vocoder/saved_models/pretrained/pretrained.pt",
-                        help="Path to a saved vocoder")
-    parser.add_argument("--low_mem", action="store_true", help=\
-        "If True, the memory used by the synthesizer will be freed after each use. Adds large "
-        "overhead but allows to save some GPU memory for lower-end GPUs.")
+    # parser = argparse.ArgumentParser(
+    #     formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    # )
+    # parser.add_argument("-e", "--enc_model_fpath", type=Path, 
+    #                     default="encoder/saved_models/pretrained.pt",
+    #                     help="Path to a saved encoder")
+    # parser.add_argument("-s", "--syn_model_dir", type=Path, 
+    #                     default="synthesizer/saved_models/logs-pretrained/",
+    #                     help="Directory containing the synthesizer model")
+    # parser.add_argument("-v", "--voc_model_fpath", type=Path, 
+    #                     default="vocoder/saved_models/pretrained/pretrained.pt",
+    #                     help="Path to a saved vocoder")
+    # parser.add_argument("--low_mem", action="store_true", help=\
+    #     "If True, the memory used by the synthesizer will be freed after each use. Adds large "
+    #     "overhead but allows to save some GPU memory for lower-end GPUs.")
     
-    parser.add_argument(
-        '-c', '--config_path', type=str, help='path to config file for training')
+    # parser.add_argument(
+    #     '-c', '--config_path', type=str, help='path to config file for training')
 
-    args = parser.parse_args()
-    print_args(args, parser)
-    config = load_config(args.config_path)
+    # args = parser.parse_args()
+    # print_args(args, parser)
+    config = load_config('conf.json')
 
     print_cuda_debug()
 
     ## Load the models one by one.
     print("Preparing the encoder, the synthesizer and the vocoder...")
-    encoder.load_model(args.enc_model_fpath)
-    synthesizer = Synthesizer(args.syn_model_dir.joinpath("taco_pretrained"), low_mem=args.low_mem)
-    vocoder.load_model(args.voc_model_fpath)
+    encoder.load_model(config.enc_model_fpath)
+    synthesizer = Synthesizer(config.syn_model_dir.joinpath("taco_pretrained"), low_mem=False)
+    vocoder.load_model(config.voc_model_fpath)
 
     server_handler = ServerHandler(config, encoder, synthesizer, vocoder)
 
