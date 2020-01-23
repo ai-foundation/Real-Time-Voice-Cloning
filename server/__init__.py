@@ -1,7 +1,7 @@
 from utils.argutils import print_args
 from synthesizer.inference import Synthesizer
-from .. import encoder.inference as encoder
-from .. import vocoder.inference as vocoder
+from ../encoder import inference as encoder
+from ../vocoder import inference as vocoder
 from pathlib import Path
 import argparse
 import torch
