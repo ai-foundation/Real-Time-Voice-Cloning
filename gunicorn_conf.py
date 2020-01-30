@@ -6,7 +6,7 @@ import os
 
 # Gunicorn settings
 host = os.getenv("HOST", "0.0.0.0")
-port = os.getenv("PORT", "5009")
+port = os.getenv("PORT", "6009")
 bind = f"{host}:{port}"
 workers = 1
 worker_class = "gthread"

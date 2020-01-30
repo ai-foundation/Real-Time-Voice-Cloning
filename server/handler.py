@@ -38,7 +38,7 @@ class ServerHandler:
         return render_template('index.html', static_url_path='/static')
 
     def speakers(self):
-        speakers = sorted(get_saved_embedding_names())
+        speakers = sorted(get_saved_embedding_names(self.embeddings_location))
         return jsonify({ "speakers": speakers })
 
     def train(self):
