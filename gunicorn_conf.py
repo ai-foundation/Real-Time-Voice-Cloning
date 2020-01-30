@@ -6,9 +6,9 @@ import os
 
 # Gunicorn settings
 host = os.getenv("HOST", "0.0.0.0")
-port = os.getenv("PORT", "6009")
+port = os.getenv("PORT", "5009")
 bind = f"{host}:{port}"
-# suggested number of workers + threads: (2*CPU)+1
+# number of workers and threads are bound by number of gpu and gpu size
 workers = 1
 worker_class = "gthread"
 threads = 1
