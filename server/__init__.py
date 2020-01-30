@@ -7,6 +7,7 @@ import argparse
 import torch
 from flask import Flask, Response, request, render_template, send_file, url_for
 from flask import jsonify, abort
+from flask_cors import CORS
 from server.handler import ServerHandler
 from server.helpers import load_config, get_saved_embedding_names, print_cuda_debug
 
@@ -46,6 +47,7 @@ def initialize():
     server_handler = ServerHandler(config, encoder, synthesizer, vocoder)
 
     app = Flask(__name__)
+    app = CORS(app)
     app.add_url_rule('/', view_func=server_handler.index)
     app.add_url_rule('/api/speakers', view_func=server_handler.speakers, methods=['GET'])
     app.add_url_rule('/api/train', view_func=server_handler.train, methods=['POST'])
