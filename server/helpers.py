@@ -49,7 +49,7 @@ def print_cuda_debug():
             gpu_properties.minor,
             gpu_properties.total_memory / 1e9))
 
-def create_new_speaker_embedding(speaker, filename, transcriptFileLocation):
+def create_new_speaker_embedding(speaker, filename, transcriptFileLocation, train_new_speaker_script_location, voice_clips_location):
     status = 1
     if not transcriptFileLocation:
         status = subprocess.call(["python", train_new_speaker_script_location, "-c", "conf.json", "--enc_model_fpath=/home/jonathan/rt-voice-cloning-models/encoder/saved_models/pretrained.pt",

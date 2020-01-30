@@ -60,7 +60,7 @@ class ServerHandler:
         # # TODO: ALLOWED FILES METHOD
         if audioFile:
             audioFile.save(self.voice_clips_location + '/' + filename)
-            create_new_speaker_embedding(speaker, filename, transcriptFileLocation)
+            create_new_speaker_embedding(speaker, filename, transcriptFileLocation, self.train_new_speaker_script_location, self.voice_clips_location)
 
             if transcriptFileLocation:
                 remove(transcriptFileLocation)
