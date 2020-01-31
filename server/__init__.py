@@ -47,7 +47,7 @@ def initialize():
     server_handler = ServerHandler(config, encoder, synthesizer, vocoder)
 
     app = Flask(__name__)
-    app = CORS(app)
+    cors = CORS(app)
     app.add_url_rule('/', view_func=server_handler.index)
     app.add_url_rule('/api/speakers', view_func=server_handler.speakers, methods=['GET'])
     app.add_url_rule('/api/train', view_func=server_handler.train, methods=['POST'])
